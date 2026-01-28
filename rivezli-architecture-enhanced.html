@@ -1,0 +1,3316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rivezli - Documentation Architecture SOA Améliorée</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* =====================================================
+           PRODUCTION-READY CSS (No CDN Dependencies)
+           All Tailwind classes compiled to standard CSS
+           ===================================================== */
+        
+        :root {
+            --rivezli: #27A6C2;
+            --rivezli1: #1e8aa0;
+            --rivezli2: #06454A;
+            --dark: #0f172a;
+            --darker: #020617;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--darker);
+            color: #f1f5f9;
+            line-height: 1.6;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: var(--rivezli); border-radius: 4px; }
+
+        /* Utilities */
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 1.5rem; }
+        .gradient-text { 
+            background: linear-gradient(135deg, var(--rivezli) 0%, var(--rivezli1) 100%); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            background-clip: text;
+        }
+        .glass { 
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+        .card { 
+            background: var(--dark); 
+            border-radius: 1rem; 
+            padding: 1.5rem; 
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .badge-success { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .badge-warning { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .badge-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .badge-info { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .badge-rivezli { background: rgba(39, 166, 194, 0.2); color: var(--rivezli); }
+
+        /* Navigation */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 300px;
+            background: var(--dark);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            overflow-y: auto;
+            z-index: 100;
+        }
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-nav { padding: 1rem; }
+        .nav-section { margin-bottom: 1.5rem; }
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #64748b;
+            margin-bottom: 0.75rem;
+            padding-left: 1rem;
+        }
+        .nav-link {
+            display: block;
+            padding: 0.6rem 1rem;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .nav-link:hover {
+            background: rgba(39, 166, 194, 0.1);
+            color: #fff;
+            border-left-color: var(--rivezli);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 300px;
+            min-height: 100vh;
+        }
+
+        /* Sections */
+        section {
+            padding: 4rem 0;
+        }
+        .section-dark { background: var(--dark); }
+        .section-darker { background: var(--darker); }
+
+        h1 { font-size: 3rem; font-weight: 700; margin-bottom: 1rem; }
+        h2 { font-size: 2.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+        h3 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; }
+        h4 { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; }
+        p { color: #94a3b8; }
+
+        /* Grid */
+        .grid { display: grid; gap: 1.5rem; }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        .grid-5 { grid-template-columns: repeat(5, 1fr); }
+
+        @media (max-width: 1200px) {
+            .grid-5 { grid-template-columns: repeat(3, 1fr); }
+            .grid-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; }
+            .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.75rem; }
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        th { 
+            background: rgba(39, 166, 194, 0.1); 
+            color: var(--rivezli);
+            font-weight: 600;
+        }
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* Architecture Diagrams */
+        .diagram-container {
+            background: linear-gradient(135deg, rgba(39, 166, 194, 0.05) 0%, rgba(30, 138, 160, 0.02) 100%);
+            border: 1px solid rgba(39, 166, 194, 0.2);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .service-node {
+            background: var(--dark);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .service-node:hover {
+            border-color: var(--rivezli);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(39, 166, 194, 0.2);
+        }
+        .service-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            font-size: 1.5rem;
+        }
+
+        /* Flow Arrows */
+        .flow-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            padding: 2rem 0;
+        }
+        .flow-arrow {
+            color: var(--rivezli);
+            font-size: 2rem;
+        }
+        .flow-box {
+            background: var(--dark);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            text-align: center;
+            min-width: 150px;
+        }
+
+        /* SWOT Analysis */
+        .swot-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        .swot-card {
+            padding: 1.5rem;
+            border-radius: 1rem;
+        }
+        .swot-strengths { background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05)); border: 1px solid rgba(34, 197, 94, 0.3); }
+        .swot-weaknesses { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05)); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .swot-opportunities { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); border: 1px solid rgba(59, 130, 246, 0.3); }
+        .swot-threats { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05)); border: 1px solid rgba(245, 158, 11, 0.3); }
+
+        /* Progress bars */
+        .progress-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        .progress-green { background: linear-gradient(90deg, #22c55e, #4ade80); }
+        .progress-yellow { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .progress-red { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .progress-blue { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+
+        /* Flex utilities */
+        .flex { display: flex; }
+        .flex-wrap { flex-wrap: wrap; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+
+        /* Spacing */
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mt-8 { margin-top: 2rem; }
+        .p-4 { padding: 1rem; }
+        .p-6 { padding: 1.5rem; }
+
+        /* Text */
+        .text-center { text-align: center; }
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .text-gray { color: #94a3b8; }
+        .text-white { color: #fff; }
+        .font-mono { font-family: 'Monaco', 'Consolas', monospace; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+
+        /* Mermaid-like diagrams with CSS */
+        .arch-layer {
+            margin: 1rem 0;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 2px dashed rgba(255,255,255,0.1);
+        }
+        .arch-layer-title {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        .arch-layer-title span {
+            background: var(--rivezli);
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Connection lines */
+        .connection-vertical {
+            width: 2px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--rivezli), transparent);
+            margin: 0 auto;
+        }
+        .connection-label {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.75rem;
+            margin: 0.5rem 0;
+        }
+
+        /* Stats cards */
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--rivezli), var(--rivezli1));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-bg {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+        }
+        .hero-bg-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--rivezli);
+            top: 10%;
+            left: 10%;
+            animation: float 8s ease-in-out infinite;
+        }
+        .hero-bg-2 {
+            width: 500px;
+            height: 500px;
+            background: var(--rivezli1);
+            bottom: 10%;
+            right: 10%;
+            animation: float 8s ease-in-out infinite 2s;
+        }
+
+        /* Feature improvements list */
+        .improvement-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255,255,255,0.02);
+            border-radius: 0.75rem;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid var(--rivezli);
+        }
+        .improvement-priority {
+            min-width: 80px;
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: #1a1a2e;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.8rem;
+            overflow-x: auto;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--rivezli), transparent);
+        }
+        .timeline-item {
+            position: relative;
+            padding-bottom: 2rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            background: var(--rivezli);
+            border-radius: 50%;
+            margin-left: -5px;
+        }
+
+        /* Service Detail Sections */
+        .service-detail-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .endpoint-table tr:nth-child(odd) {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .model-schema {
+            background: #1a1a2e;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 0.75rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Animated gradient border for service cards */
+        .service-highlight {
+            position: relative;
+            background: var(--dark);
+            border-radius: 1rem;
+            padding: 2rem;
+        }
+
+        .service-highlight::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--rivezli), var(--rivezli1), var(--rivezli2), var(--rivezli1));
+            border-radius: 1rem;
+            z-index: -1;
+            background-size: 300% 300%;
+            animation: gradientBorder 5s ease infinite;
+        }
+
+        @keyframes gradientBorder {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* API Method badges */
+        .method-get { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .method-post { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .method-put { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .method-delete { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+        /* Data model visualizations */
+        .schema-field {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .schema-field:last-child {
+            border-bottom: none;
+        }
+
+        .field-name {
+            color: #22c55e;
+            font-family: monospace;
+        }
+
+        .field-type {
+            color: #f59e0b;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+
+        /* Communication flow arrows */
+        .comm-arrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(39, 166, 194, 0.1);
+            border-radius: 0.5rem;
+            margin: 0.25rem;
+        }
+
+        .comm-arrow::after {
+            content: '→';
+            color: var(--rivezli);
+            font-weight: bold;
+        }
+
+        /* Tech stack pills */
+        .tech-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            margin: 0.25rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .grid-3 { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="flex items-center gap-4">
+                <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, var(--rivezli), var(--rivezli1)); display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 1.5rem;">🎓</span>
+                </div>
+                <div>
+                    <h1 style="font-size: 1.25rem; margin: 0;" class="gradient-text">Rivezli</h1>
+                    <p style="font-size: 0.75rem; margin: 0;">Documentation v3.0</p>
+                </div>
+            </div>
+        </div>
+        <div class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Vue d'ensemble</div>
+                <a href="#hero" class="nav-link">🏠 Introduction</a>
+                <a href="#architecture" class="nav-link">🏗️ Architecture Globale</a>
+                <a href="#tech-stack" class="nav-link">⚙️ Stack Technologique</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Diagrammes</div>
+                <a href="#service-diagram" class="nav-link">📊 Diagramme Services</a>
+                <a href="#data-flow" class="nav-link">🔄 Flux de Données</a>
+                <a href="#communication" class="nav-link">📡 Communication</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Microservices Détaillés</div>
+                <a href="#services-detail" class="nav-link">📋 Vue d'ensemble</a>
+                <a href="#service-user-detail" class="nav-link">👤 User Service</a>
+                <a href="#service-courses-detail" class="nav-link">📚 Courses Service</a>
+                <a href="#service-category-detail" class="nav-link">📁 Category Service</a>
+                <a href="#service-achats-detail" class="nav-link">🛒 Achats Service</a>
+                <a href="#service-recharges-detail" class="nav-link">💳 Recharges Service</a>
+                <a href="#service-notifications-detail" class="nav-link">🔔 Notifications Service</a>
+                <a href="#service-bankpayment-detail" class="nav-link">🏦 BankPayment Service</a>
+                <a href="#service-quiz-detail" class="nav-link">❓ Quiz Service</a>
+                <a href="#service-concours-detail" class="nav-link">🏆 Concours Service</a>
+                <a href="#service-sondage-detail" class="nav-link">📊 Sondage Service</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Analyse</div>
+                <a href="#swot" class="nav-link">📈 Analyse SWOT</a>
+                <a href="#strengths-weaknesses" class="nav-link">💪 Forces & Faiblesses</a>
+                <a href="#improvements" class="nav-link">🔧 Améliorations</a>
+                <a href="#new-features" class="nav-link">🚀 Nouvelles Fonctionnalités</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section id="hero" class="hero section-darker">
+            <div class="hero-bg hero-bg-1"></div>
+            <div class="hero-bg hero-bg-2"></div>
+            <div class="container text-center" style="position: relative; z-index: 1;">
+                <div class="glass" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 9999px; margin-bottom: 2rem;">
+                    <span style="width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: pulse 2s infinite;"></span>
+                    <span class="text-sm text-gray">Documentation Architecturale Complète v3.0 - Avec Détails Techniques</span>
+                </div>
+                <h1><span class="gradient-text">Rivezli</span> Platform</h1>
+                <p style="font-size: 1.25rem; max-width: 800px; margin: 0 auto 2rem;">
+                    Plateforme E-learning SOA avec microservices, notifications temps réel, 
+                    et système de paiement intégré pour le marché éducatif tunisien.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <div class="glass stat-card" style="border-radius: 1rem; min-width: 140px;">
+                        <div class="stat-value">10</div>
+                        <div class="stat-label">Microservices</div>
+                    </div>
+                    <div class="glass stat-card" style="border-radius: 1rem; min-width: 140px;">
+                        <div class="stat-value">200+</div>
+                        <div class="stat-label">API Endpoints</div>
+                    </div>
+                    <div class="glass stat-card" style="border-radius: 1rem; min-width: 140px;">
+                        <div class="stat-value">4</div>
+                        <div class="stat-label">Rôles Utilisateur</div>
+                    </div>
+                    <div class="glass stat-card" style="border-radius: 1rem; min-width: 140px;">
+                        <div class="stat-value">2</div>
+                        <div class="stat-label">Bases de Données</div>
+                    </div>
+                    <div class="glass stat-card" style="border-radius: 1rem; min-width: 140px;">
+                        <div class="stat-value">30+</div>
+                        <div class="stat-label">Modèles de Données</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Overview -->
+        <section id="architecture" class="section-dark">
+            <div class="container">
+                <div class="text-center mb-8">
+                    <h2>Architecture <span class="gradient-text">Globale</span></h2>
+                    <p>Vue d'ensemble de l'architecture SOA microservices de Rivezli</p>
+                </div>
+
+                <div class="diagram-container">
+                    <!-- Frontend Layer -->
+                    <div class="arch-layer">
+                        <div class="arch-layer-title"><span>🎨 Frontend Layer</span></div>
+                        <div class="grid grid-3" style="max-width: 900px; margin: 0 auto;">
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #3b82f6, #06b6d4);">⚛️</div>
+                                <h4>React 18 + Vite</h4>
+                                <p class="text-xs text-gray">SPA Framework</p>
+                            </div>
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #8b5cf6, #ec4899);">🔄</div>
+                                <h4>Redux + Persist</h4>
+                                <p class="text-xs text-gray">State Management</p>
+                            </div>
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #06b6d4, #22c55e);">🔌</div>
+                                <h4>Socket.io Client</h4>
+                                <p class="text-xs text-gray">Real-time Events</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="connection-vertical"></div>
+                    <div class="connection-label">HTTPS / WebSocket / REST API</div>
+                    <div class="connection-vertical"></div>
+
+                    <!-- Backend Services Layer -->
+                    <div class="arch-layer">
+                        <div class="arch-layer-title"><span>⚡ Backend Microservices Layer</span></div>
+                        <div class="grid grid-5" style="gap: 1rem;">
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">👤</div>
+                                <h4>User</h4>
+                                <p class="text-xs text-gray">:5002/5003</p>
+                                <span class="badge badge-success">Node.js</span>
+                            </div>
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">📚</div>
+                                <h4>Courses</h4>
+                                <p class="text-xs text-gray">:5032/5033</p>
+                                <span class="badge badge-success">Node.js</span>
+                            </div>
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #22c55e, #16a34a);">📁</div>
+                                <h4>Category</h4>
+                                <p class="text-xs text-gray">:5012/5013</p>
+                                <span class="badge badge-success">Node.js</span>
+                            </div>
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">🛒</div>
+                                <h4>Achats</h4>
+                                <p class="text-xs text-gray">:5042/5043</p>
+                                <span class="badge badge-success">Node.js</span>
+                            </div>
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #ec4899, #be185d);">💳</div>
+                                <h4>Recharges</h4>
+                                <p class="text-xs text-gray">:5052/5053</p>
+                                <span class="badge badge-success">Node.js</span>
+                            </div>
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">🔔</div>
+                                <h4>Notifications</h4>
+                                <p class="text-xs text-gray">:5062/5063</p>
+                                <span class="badge badge-success">Node.js</span>
+                            </div>
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #6366f1, #4338ca);">🏦</div>
+                                <h4>BankPayment</h4>
+                                <p class="text-xs text-gray">:5022/5023</p>
+                                <span class="badge badge-success">Node.js</span>
+                            </div>
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #14b8a6, #0d9488);">❓</div>
+                                <h4>Quiz</h4>
+                                <p class="text-xs text-gray">:5072/5073</p>
+                                <span class="badge badge-success">Node.js</span>
+                            </div>
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #f97316, #ea580c);">🏆</div>
+                                <h4>Concours</h4>
+                                <p class="text-xs text-gray">:8080/8081</p>
+                                <span class="badge badge-warning">Spring Boot</span>
+                            </div>
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">📊</div>
+                                <h4>Sondage</h4>
+                                <p class="text-xs text-gray">:5081/5082</p>
+                                <span class="badge badge-success">Node.js</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="connection-vertical"></div>
+                    <div class="connection-label">RabbitMQ / MongoDB / MySQL / Redis</div>
+                    <div class="connection-vertical"></div>
+
+                    <!-- Infrastructure Layer -->
+                    <div class="arch-layer">
+                        <div class="arch-layer-title"><span>🗄️ Infrastructure Layer</span></div>
+                        <div class="grid grid-4" style="max-width: 800px; margin: 0 auto;">
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #22c55e, #16a34a);">🍃</div>
+                                <h4>MongoDB Atlas</h4>
+                                <p class="text-xs text-gray">Document DB</p>
+                            </div>
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">🐬</div>
+                                <h4>MySQL</h4>
+                                <p class="text-xs text-gray">Relational DB</p>
+                            </div>
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #f97316, #ea580c);">🐰</div>
+                                <h4>RabbitMQ</h4>
+                                <p class="text-xs text-gray">Message Broker</p>
+                            </div>
+                            <div class="service-node">
+                                <div class="service-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">⚡</div>
+                                <h4>Redis</h4>
+                                <p class="text-xs text-gray">Cache & Sessions</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Service Communication Diagram -->
+        <section id="service-diagram" class="section-darker">
+            <div class="container">
+                <div class="text-center mb-8">
+                    <h2>Diagramme des <span class="gradient-text">Services</span></h2>
+                    <p>Interactions et dépendances entre les microservices</p>
+                </div>
+
+                <div class="diagram-container">
+                    <div style="overflow-x: auto;">
+                        <svg viewBox="0 0 1200 600" style="min-width: 1000px; width: 100%; height: auto;">
+                            <!-- Definitions -->
+                            <defs>
+                                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                    <polygon points="0 0, 10 3.5, 0 7" fill="#27A6C2"/>
+                                </marker>
+                                <linearGradient id="nodeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#1e293b"/>
+                                    <stop offset="100%" style="stop-color:#0f172a"/>
+                                </linearGradient>
+                            </defs>
+
+                            <!-- Frontend -->
+                            <rect x="500" y="20" width="200" height="60" rx="10" fill="url(#nodeGradient)" stroke="#3b82f6" stroke-width="2"/>
+                            <text x="600" y="55" text-anchor="middle" fill="white" font-size="14" font-weight="bold">🎨 Frontend React</text>
+
+                            <!-- Arrows from Frontend -->
+                            <line x1="600" y1="80" x2="600" y2="120" stroke="#27A6C2" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+                            <!-- User Service (Central) -->
+                            <rect x="500" y="130" width="200" height="70" rx="10" fill="url(#nodeGradient)" stroke="#27A6C2" stroke-width="3"/>
+                            <text x="600" y="160" text-anchor="middle" fill="#27A6C2" font-size="14" font-weight="bold">👤 User Service</text>
+                            <text x="600" y="180" text-anchor="middle" fill="#94a3b8" font-size="10">Auth, Wallet, Profiles</text>
+
+                            <!-- Courses Service -->
+                            <rect x="150" y="250" width="180" height="70" rx="10" fill="url(#nodeGradient)" stroke="#8b5cf6" stroke-width="2"/>
+                            <text x="240" y="280" text-anchor="middle" fill="#8b5cf6" font-size="14" font-weight="bold">📚 Courses</text>
+                            <text x="240" y="300" text-anchor="middle" fill="#94a3b8" font-size="10">Cours, Packs, Lives</text>
+
+                            <!-- Achats Service -->
+                            <rect x="350" y="250" width="180" height="70" rx="10" fill="url(#nodeGradient)" stroke="#f59e0b" stroke-width="2"/>
+                            <text x="440" y="280" text-anchor="middle" fill="#f59e0b" font-size="14" font-weight="bold">🛒 Achats</text>
+                            <text x="440" y="300" text-anchor="middle" fill="#94a3b8" font-size="10">Historique, Stats</text>
+
+                            <!-- Recharges Service -->
+                            <rect x="670" y="250" width="180" height="70" rx="10" fill="url(#nodeGradient)" stroke="#ec4899" stroke-width="2"/>
+                            <text x="760" y="280" text-anchor="middle" fill="#ec4899" font-size="14" font-weight="bold">💳 Recharges</text>
+                            <text x="760" y="300" text-anchor="middle" fill="#94a3b8" font-size="10">Codes, Wallet</text>
+
+                            <!-- Notifications Service -->
+                            <rect x="870" y="250" width="180" height="70" rx="10" fill="url(#nodeGradient)" stroke="#ef4444" stroke-width="2"/>
+                            <text x="960" y="280" text-anchor="middle" fill="#ef4444" font-size="14" font-weight="bold">🔔 Notifications</text>
+                            <text x="960" y="300" text-anchor="middle" fill="#94a3b8" font-size="10">Push Real-time</text>
+
+                            <!-- Category Service -->
+                            <rect x="50" y="380" width="160" height="60" rx="10" fill="url(#nodeGradient)" stroke="#22c55e" stroke-width="2"/>
+                            <text x="130" y="415" text-anchor="middle" fill="#22c55e" font-size="12" font-weight="bold">📁 Category</text>
+
+                            <!-- Quiz Service -->
+                            <rect x="230" y="380" width="160" height="60" rx="10" fill="url(#nodeGradient)" stroke="#14b8a6" stroke-width="2"/>
+                            <text x="310" y="415" text-anchor="middle" fill="#14b8a6" font-size="12" font-weight="bold">❓ Quiz</text>
+
+                            <!-- BankPayment Service -->
+                            <rect x="410" y="380" width="160" height="60" rx="10" fill="url(#nodeGradient)" stroke="#6366f1" stroke-width="2"/>
+                            <text x="490" y="415" text-anchor="middle" fill="#6366f1" font-size="12" font-weight="bold">🏦 BankPayment</text>
+
+                            <!-- Concours Service -->
+                            <rect x="590" y="380" width="160" height="60" rx="10" fill="url(#nodeGradient)" stroke="#f97316" stroke-width="2"/>
+                            <text x="670" y="415" text-anchor="middle" fill="#f97316" font-size="12" font-weight="bold">🏆 Concours</text>
+
+                            <!-- Sondage Service -->
+                            <rect x="770" y="380" width="160" height="60" rx="10" fill="url(#nodeGradient)" stroke="#06b6d4" stroke-width="2"/>
+                            <text x="850" y="415" text-anchor="middle" fill="#06b6d4" font-size="12" font-weight="bold">📊 Sondage</text>
+
+                            <!-- RabbitMQ -->
+                            <rect x="450" y="500" width="300" height="60" rx="10" fill="url(#nodeGradient)" stroke="#f97316" stroke-width="3"/>
+                            <text x="600" y="535" text-anchor="middle" fill="#f97316" font-size="14" font-weight="bold">🐰 RabbitMQ Message Broker</text>
+
+                            <!-- Connection Lines -->
+                            <!-- User to Courses -->
+                            <path d="M 500 170 Q 350 170 330 250" stroke="#27A6C2" stroke-width="1.5" fill="none" stroke-dasharray="5,3"/>
+                            <!-- User to Achats -->
+                            <line x1="520" y1="200" x2="480" y2="250" stroke="#27A6C2" stroke-width="1.5" stroke-dasharray="5,3"/>
+                            <!-- User to Recharges -->
+                            <line x1="680" y1="200" x2="720" y2="250" stroke="#27A6C2" stroke-width="1.5" stroke-dasharray="5,3"/>
+                            <!-- User to Notifications -->
+                            <path d="M 700 170 Q 850 170 870 250" stroke="#27A6C2" stroke-width="1.5" fill="none" stroke-dasharray="5,3"/>
+
+                            <!-- Courses to RabbitMQ -->
+                            <line x1="240" y1="320" x2="480" y2="500" stroke="#f97316" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                            <!-- Recharges to RabbitMQ -->
+                            <line x1="760" y1="320" x2="680" y2="500" stroke="#f97316" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                            <!-- RabbitMQ to Notifications -->
+                            <line x1="720" y1="500" x2="900" y2="320" stroke="#f97316" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+                            <!-- RabbitMQ to User (wallet updates) -->
+                            <path d="M 600 500 Q 600 400 600 200" stroke="#f97316" stroke-width="1.5" fill="none" marker-end="url(#arrowhead)"/>
+
+                            <!-- Legend -->
+                            <rect x="950" y="480" width="200" height="100" rx="5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)"/>
+                            <text x="970" y="500" fill="#94a3b8" font-size="10">Légende:</text>
+                            <line x1="970" y1="515" x2="1010" y2="515" stroke="#27A6C2" stroke-width="2" stroke-dasharray="5,3"/>
+                            <text x="1020" y="518" fill="#94a3b8" font-size="9">HTTP/REST</text>
+                            <line x1="970" y1="535" x2="1010" y2="535" stroke="#f97316" stroke-width="2"/>
+                            <text x="1020" y="538" fill="#94a3b8" font-size="9">RabbitMQ</text>
+                            <line x1="970" y1="555" x2="1010" y2="555" stroke="#22c55e" stroke-width="2"/>
+                            <text x="1020" y="558" fill="#94a3b8" font-size="9">Socket.io</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Data Flow Diagrams -->
+        <section id="data-flow" class="section-dark">
+            <div class="container">
+                <div class="text-center mb-8">
+                    <h2>Flux de <span class="gradient-text">Données</span></h2>
+                    <p>Parcours des données à travers le système</p>
+                </div>
+
+                <div class="grid grid-2">
+                    <!-- Course Purchase Flow -->
+                    <div class="card">
+                        <h3 class="mb-4">🛒 Achat d'un Cours</h3>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <h4>1. Sélection du cours</h4>
+                                <p class="text-sm">Frontend → Courses Service (GET /get_one_course_home/:id)</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4>2. Vérification du solde</h4>
+                                <p class="text-sm">Courses Service → User Service (vérification wallet)</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4>3. Débit du wallet</h4>
+                                <p class="text-sm">Courses → RabbitMQ → User Service (debit wallet)</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4>4. Création de l'achat</h4>
+                                <p class="text-sm">Courses Service → MongoDB (Achat document)</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4>5. Notification temps réel</h4>
+                                <p class="text-sm">RabbitMQ → Notifications → Socket.io → Frontend</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wallet Recharge Flow -->
+                    <div class="card">
+                        <h3 class="mb-4">💳 Recharge Wallet</h3>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <h4>1. Entrée du code</h4>
+                                <p class="text-sm">Frontend → Recharges Service (POST /valider_code)</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4>2. Validation du code</h4>
+                                <p class="text-sm">Recharges Service → MongoDB (vérification code)</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4>3. Crédit du wallet</h4>
+                                <p class="text-sm">Recharges → RabbitMQ → User Service (credit wallet)</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4>4. Mise à jour du code</h4>
+                                <p class="text-sm">Recharges Service → MongoDB (marquer code utilisé)</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4>5. Confirmation</h4>
+                                <p class="text-sm">RabbitMQ → Notifications → Socket.io → Frontend</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bank Payment Flow -->
+                    <div class="card">
+                        <h3 class="mb-4">🏦 Versement Bancaire</h3>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <h4>1. Upload du reçu</h4>
+                                <p class="text-sm">Frontend → BankPayment Service (POST /create)</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4>2. Stockage CDN</h4>
+                                <p class="text-sm">BankPayment → BunnyCDN (upload image)</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4>3. En attente d'approbation</h4>
+                                <p class="text-sm">Admin Dashboard → BankPayment (GET /pending)</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4>4. Approbation/Refus</h4>
+                                <p class="text-sm">Admin → BankPayment (PUT /approve ou /reject)</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4>5. Crédit automatique</h4>
+                                <p class="text-sm">BankPayment → RabbitMQ → User Service (credit)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Session Flow -->
+                    <div class="card">
+                        <h3 class="mb-4">🎥 Session Live</h3>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <h4>1. Création du live</h4>
+                                <p class="text-sm">Admin → Courses Service (POST /add_live)</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4>2. Notification programmée</h4>
+                                <p class="text-sm">Cron Job → RabbitMQ → Notifications</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4>3. Push aux étudiants</h4>
+                                <p class="text-sm">Notifications → Socket.io → Frontend (filtré par niveau)</p>
+                            </div>
+                            <div class="timeline-item">
+                                <h4>4. Participation</h4>
+                                <p class="text-sm">Frontend → External (Zoom/Google Meet link)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Communication Patterns -->
+        <section id="communication" class="section-darker">
+            <div class="container">
+                <div class="text-center mb-8">
+                    <h2>Patterns de <span class="gradient-text">Communication</span></h2>
+                    <p>Mécanismes d'échange entre services</p>
+                </div>
+
+                <div class="grid grid-3">
+                    <!-- RabbitMQ -->
+                    <div class="card">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="service-icon" style="background: linear-gradient(135deg, #f97316, #ea580c);">🐰</div>
+                            <div>
+                                <h3>RabbitMQ</h3>
+                                <p class="text-sm text-gray">Message Broker Asynchrone</p>
+                            </div>
+                        </div>
+                        <h4 class="mb-2">Queues:</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li class="mb-2"><span class="badge badge-rivezli">user-service-queue</span> Wallet operations</li>
+                            <li class="mb-2"><span class="badge badge-rivezli">notifications-service-queue</span> Push notifications</li>
+                        </ul>
+                        <h4 class="mb-2 mt-4">Messages Types:</h4>
+                        <div class="code-block">
+{
+  "userId": "string",
+  "amount": "number",
+  "type": "credit" | "debit",
+  "transactionId": "string"
+}
+                        </div>
+                    </div>
+
+                    <!-- Socket.io -->
+                    <div class="card">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="service-icon" style="background: linear-gradient(135deg, #22c55e, #16a34a);">⚡</div>
+                            <div>
+                                <h3>Socket.io</h3>
+                                <p class="text-sm text-gray">WebSocket Real-time</p>
+                            </div>
+                        </div>
+                        <h4 class="mb-2">Events émis:</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li class="mb-2"><code style="color: var(--rivezli);">purchase_notification</code></li>
+                            <li class="mb-2"><code style="color: var(--rivezli);">recharge_notification</code></li>
+                            <li class="mb-2"><code style="color: var(--rivezli);">live_notification</code></li>
+                            <li class="mb-2"><code style="color: var(--rivezli);">survey_notification</code></li>
+                            <li class="mb-2"><code style="color: var(--rivezli);">userConnectionStatusUpdated</code></li>
+                            <li class="mb-2"><code style="color: var(--rivezli);">logoutUser</code></li>
+                            <li class="mb-2"><code style="color: var(--rivezli);">banUser</code></li>
+                        </ul>
+                    </div>
+
+                    <!-- HTTP REST -->
+                    <div class="card">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="service-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">🌐</div>
+                            <div>
+                                <h3>HTTP REST</h3>
+                                <p class="text-sm text-gray">Synchronous API Calls</p>
+                            </div>
+                        </div>
+                        <h4 class="mb-2">Inter-Service Calls:</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li class="mb-2">
+                                <span class="badge badge-info">Courses → User</span>
+                                <p class="text-xs text-gray">Vérification wallet avant achat</p>
+                            </li>
+                            <li class="mb-2">
+                                <span class="badge badge-info">Quiz → Courses</span>
+                                <p class="text-xs text-gray">Association chapitres</p>
+                            </li>
+                            <li class="mb-2">
+                                <span class="badge badge-info">BankPayment → User</span>
+                                <p class="text-xs text-gray">Crédit après approbation</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- DETAILED MICROSERVICES ARCHITECTURE SECTION   -->
+        <!-- ============================================== -->
+
+        <!-- Services Overview -->
+        <section id="services-detail" class="section-dark">
+            <div class="container">
+                <div class="text-center mb-8">
+                    <h2>Architecture <span class="gradient-text">Détaillée</span> des Microservices</h2>
+                    <p>Documentation technique complète de chaque service du système Rivezli</p>
+                </div>
+
+                <!-- Services Summary Table -->
+                <div class="card mb-8">
+                    <h3 class="mb-4">📋 Tableau Récapitulatif des Services</h3>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Service</th>
+                                    <th>Stack</th>
+                                    <th>Port Test/Prod</th>
+                                    <th>Base de Données</th>
+                                    <th>Rôle Principal</th>
+                                    <th>Endpoints</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge badge-info">👤 User</span></td>
+                                    <td>Node.js/Express/TypeScript</td>
+                                    <td><code>5002/5003</code></td>
+                                    <td>MongoDB Atlas</td>
+                                    <td>Authentification, Profils, Wallet</td>
+                                    <td>~35</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">📚 Courses</span></td>
+                                    <td>Node.js/Express/TypeScript</td>
+                                    <td><code>5032/5033</code></td>
+                                    <td>MongoDB Atlas</td>
+                                    <td>Gestion des cours, chapitres, packs</td>
+                                    <td>~85</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">📁 Category</span></td>
+                                    <td>Node.js/Express/TypeScript</td>
+                                    <td><code>5012/5013</code></td>
+                                    <td>MongoDB Atlas</td>
+                                    <td>Catégories, niveaux, sections</td>
+                                    <td>~14</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">🛒 Achats</span></td>
+                                    <td>Node.js/Express/TypeScript</td>
+                                    <td><code>5042/5043</code></td>
+                                    <td>MongoDB Atlas</td>
+                                    <td>Historique des achats, statistiques</td>
+                                    <td>~8</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">💳 Recharges</span></td>
+                                    <td>Node.js/Express/TypeScript</td>
+                                    <td><code>5052/5053</code></td>
+                                    <td>MongoDB Atlas</td>
+                                    <td>Codes de recharge, validation</td>
+                                    <td>~7</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">🔔 Notifications</span></td>
+                                    <td>Node.js/Express/TypeScript</td>
+                                    <td><code>5062/5063</code></td>
+                                    <td>MongoDB Atlas</td>
+                                    <td>Notifications temps réel</td>
+                                    <td>~3</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">🏦 BankPayment</span></td>
+                                    <td>Node.js/Express/TypeScript</td>
+                                    <td><code>5022/5023</code></td>
+                                    <td>MongoDB Atlas</td>
+                                    <td>Versements bancaires</td>
+                                    <td>~5</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">❓ Quiz</span></td>
+                                    <td>Node.js/Express/TypeScript</td>
+                                    <td><code>5072/5073</code></td>
+                                    <td>MongoDB Atlas</td>
+                                    <td>Quiz pour chapitres de cours</td>
+                                    <td>~12</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-warning">🏆 Concours</span></td>
+                                    <td>Spring Boot/Java 17</td>
+                                    <td><code>8080/8081</code></td>
+                                    <td>MySQL</td>
+                                    <td>Concours et compétitions</td>
+                                    <td>~15</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">📊 Sondage</span></td>
+                                    <td>Node.js/Express/TypeScript</td>
+                                    <td><code>5081/5082</code></td>
+                                    <td>MongoDB Atlas</td>
+                                    <td>Enquêtes et sondages</td>
+                                    <td>~20</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Architecture Pattern Summary -->
+                <div class="grid grid-3 mb-8">
+                    <div class="card">
+                        <h4 style="color: var(--rivezli);">🏛️ Pattern Architectural</h4>
+                        <p class="text-sm text-gray mb-4">Tous les services Node.js suivent une architecture en couches:</p>
+                        <div class="code-block">
+📁 src/
+├── Controllers/    # Business Logic
+├── Routes/         # Express Router
+├── Models/         # Mongoose Schemas
+├── Middlewares/    # Auth, Validation
+├── Types/          # TypeScript Interfaces
+├── Utils/          # RabbitMQ, Helpers
+└── server.ts       # Entry Point
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h4 style="color: var(--rivezli);">🔄 Communication Patterns</h4>
+                        <ul class="text-sm" style="padding-left: 1.5rem;">
+                            <li class="mb-2"><strong>Synchrone:</strong> HTTP REST (inter-service calls)</li>
+                            <li class="mb-2"><strong>Asynchrone:</strong> RabbitMQ (wallet, notifications)</li>
+                            <li class="mb-2"><strong>Real-time:</strong> Socket.io + Redis Adapter</li>
+                            <li class="mb-2"><strong>CDN:</strong> BunnyCDN pour les médias</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4 style="color: var(--rivezli);">🔒 Sécurité Commune</h4>
+                        <ul class="text-sm" style="padding-left: 1.5rem;">
+                            <li class="mb-2">JWT + Refresh Token</li>
+                            <li class="mb-2">bcryptjs pour le hashing</li>
+                            <li class="mb-2">express-validator pour la validation</li>
+                            <li class="mb-2">Helmet pour les headers</li>
+                            <li class="mb-2">CORS configuré</li>
+                            <li class="mb-2">Rate limiting avec Redis</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- USER SERVICE DETAIL -->
+        <section id="service-user-detail" class="section-darker">
+            <div class="container">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); width: 64px; height: 64px; font-size: 2rem;">👤</div>
+                    <div>
+                        <h2 class="gradient-text">User Service</h2>
+                        <p class="text-gray">Service central d'authentification et gestion des utilisateurs</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-2 mb-6">
+                    <!-- Role & Responsibilities -->
+                    <div class="card">
+                        <h3 class="mb-4">🎯 Rôle et Responsabilités</h3>
+                        <ul style="padding-left: 1.5rem;">
+                            <li class="mb-2"><strong>Authentification:</strong> Login, Register, JWT, Refresh Token</li>
+                            <li class="mb-2"><strong>Gestion des profils:</strong> CRUD utilisateurs, avatars</li>
+                            <li class="mb-2"><strong>Wallet:</strong> Gestion du portefeuille virtuel</li>
+                            <li class="mb-2"><strong>Rôles:</strong> Student, Admin, Supervisor, SuperAdmin</li>
+                            <li class="mb-2"><strong>Vérification:</strong> Email verification, password reset</li>
+                            <li class="mb-2"><strong>Sessions:</strong> Gestion des connexions actives</li>
+                            <li class="mb-2"><strong>Modération:</strong> Ban/Unban utilisateurs</li>
+                        </ul>
+                    </div>
+
+                    <!-- Tech Stack -->
+                    <div class="card">
+                        <h3 class="mb-4">⚙️ Stack Technique</h3>
+                        <table>
+                            <tr><td>Runtime</td><td>Node.js 20 LTS</td></tr>
+                            <tr><td>Framework</td><td>Express.js 4.x</td></tr>
+                            <tr><td>Language</td><td>TypeScript 5.x</td></tr>
+                            <tr><td>Database</td><td>MongoDB Atlas (Mongoose)</td></tr>
+                            <tr><td>Message Queue</td><td>RabbitMQ (Consumer)</td></tr>
+                            <tr><td>Real-time</td><td>Socket.io + Redis Adapter</td></tr>
+                            <tr><td>Process Manager</td><td>PM2 (Cluster Mode)</td></tr>
+                            <tr><td>Ports</td><td>5002 (test) / 5003 (prod)</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Data Models -->
+                <div class="card mb-6">
+                    <h3 class="mb-4">📊 Modèles de Données</h3>
+                    <div class="grid grid-2">
+                        <div>
+                            <h4 style="color: var(--rivezli);">User Schema</h4>
+                            <div class="code-block">
+{
+  name: String (required),
+  email: String (unique, required),
+  password: String (bcrypt hashed),
+  phone: Number (required),
+  role: "student" | "admin" | "super admin" | "supervisor",
+  studentId: Number (unique),
+  category: String,  // "Prepa", "BAC", etc.
+  section: String,   // "MP", "PC", etc.
+  niveau: String,    // "1ere", "2eme", etc.
+  faculty: String,
+  isBanned: Boolean,
+  avatarUrl: String,
+  loginCount: Number,
+  lastLoginDate: Date,
+  wallet: Number (default: 0),
+  isVerified: Boolean,
+  activeSessionToken: String,
+  isConnected: Boolean,
+  timeSpentOnPlatform: Number,
+  isDark: Boolean,
+  passCode: String,
+  timestamps: { createdAt, updatedAt }
+}
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--rivezli);">Modèles Associés</h4>
+                            <div class="code-block">
+// PasswordResetToken
+{
+  userId: ObjectId,
+  token: String (unique),
+  expiresAt: Date
+}
+
+// VerificationToken
+{
+  userId: ObjectId,
+  token: String (unique),
+  expiresAt: Date
+}
+
+// TransactionAttempt
+{
+  userId: ObjectId,
+  amount: Number,
+  status: String,
+  paymentMethod: String,
+  timestamps
+}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Endpoints -->
+                <div class="card mb-6">
+                    <h3 class="mb-4">🔌 Endpoints API</h3>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Méthode</th>
+                                    <th>Endpoint</th>
+                                    <th>Middleware</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background: rgba(34, 197, 94, 0.1);">
+                                    <td><span class="badge badge-success">POST</span></td>
+                                    <td><code>/login</code></td>
+                                    <td>LoginValidator</td>
+                                    <td>Authentification utilisateur</td>
+                                </tr>
+                                <tr style="background: rgba(34, 197, 94, 0.1);">
+                                    <td><span class="badge badge-success">POST</span></td>
+                                    <td><code>/register</code></td>
+                                    <td>RegisterValidator</td>
+                                    <td>Création de compte</td>
+                                </tr>
+                                <tr style="background: rgba(34, 197, 94, 0.1);">
+                                    <td><span class="badge badge-success">POST</span></td>
+                                    <td><code>/refresh-token</code></td>
+                                    <td>-</td>
+                                    <td>Renouvellement du JWT</td>
+                                </tr>
+                                <tr style="background: rgba(34, 197, 94, 0.1);">
+                                    <td><span class="badge badge-success">POST</span></td>
+                                    <td><code>/logout</code></td>
+                                    <td>isAuthUser</td>
+                                    <td>Déconnexion</td>
+                                </tr>
+                                <tr style="background: rgba(59, 130, 246, 0.1);">
+                                    <td><span class="badge badge-info">PUT</span></td>
+                                    <td><code>/verify_user/:token</code></td>
+                                    <td>-</td>
+                                    <td>Vérification email</td>
+                                </tr>
+                                <tr style="background: rgba(59, 130, 246, 0.1);">
+                                    <td><span class="badge badge-info">PUT</span></td>
+                                    <td><code>/ban_user/:id</code></td>
+                                    <td>isAuthUser, isSupervisor</td>
+                                    <td>Bannir un utilisateur</td>
+                                </tr>
+                                <tr style="background: rgba(59, 130, 246, 0.1);">
+                                    <td><span class="badge badge-info">PUT</span></td>
+                                    <td><code>/update_password_user</code></td>
+                                    <td>isAuthUser</td>
+                                    <td>Changement de mot de passe</td>
+                                </tr>
+                                <tr style="background: rgba(59, 130, 246, 0.1);">
+                                    <td><span class="badge badge-info">PUT</span></td>
+                                    <td><code>/update_infos_user</code></td>
+                                    <td>isAuthUser</td>
+                                    <td>Mise à jour du profil</td>
+                                </tr>
+                                <tr style="background: rgba(245, 158, 11, 0.1);">
+                                    <td><span class="badge badge-warning">GET</span></td>
+                                    <td><code>/get_one_user/:id</code></td>
+                                    <td>-</td>
+                                    <td>Récupérer un utilisateur</td>
+                                </tr>
+                                <tr style="background: rgba(245, 158, 11, 0.1);">
+                                    <td><span class="badge badge-warning">GET</span></td>
+                                    <td><code>/get_all_users</code></td>
+                                    <td>isAuthUser, isSupervisor</td>
+                                    <td>Liste des utilisateurs</td>
+                                </tr>
+                                <tr style="background: rgba(245, 158, 11, 0.1);">
+                                    <td><span class="badge badge-warning">GET</span></td>
+                                    <td><code>/get_active_users</code></td>
+                                    <td>isAuthUser, isSupervisor</td>
+                                    <td>Utilisateurs connectés</td>
+                                </tr>
+                                <tr style="background: rgba(34, 197, 94, 0.1);">
+                                    <td><span class="badge badge-success">POST</span></td>
+                                    <td><code>/add_wallet/:id</code></td>
+                                    <td>isAuthUser, isSupervisor</td>
+                                    <td>Ajouter des points au wallet</td>
+                                </tr>
+                                <tr style="background: rgba(34, 197, 94, 0.1);">
+                                    <td><span class="badge badge-success">POST</span></td>
+                                    <td><code>/purchase_points</code></td>
+                                    <td>isAuthUser, isStudent</td>
+                                    <td>Achat de points (Konnect)</td>
+                                </tr>
+                                <tr style="background: rgba(59, 130, 246, 0.1);">
+                                    <td><span class="badge badge-info">PUT</span></td>
+                                    <td><code>/pay_course/:id/:amount</code></td>
+                                    <td>-</td>
+                                    <td>Débit wallet pour achat cours</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Inter-Service Dependencies & Communication -->
+                <div class="grid grid-2">
+                    <div class="card">
+                        <h3 class="mb-4">🔗 Dépendances Inter-Services</h3>
+                        <div class="improvement-item">
+                            <div><span class="badge badge-rivezli">→ Courses</span></div>
+                            <div class="text-sm">Appel HTTP pour vérifier wallet avant achat</div>
+                        </div>
+                        <div class="improvement-item">
+                            <div><span class="badge badge-rivezli">← Recharges</span></div>
+                            <div class="text-sm">RabbitMQ: crédit wallet après validation code</div>
+                        </div>
+                        <div class="improvement-item">
+                            <div><span class="badge badge-rivezli">← BankPayment</span></div>
+                            <div class="text-sm">RabbitMQ: crédit wallet après approbation</div>
+                        </div>
+                        <div class="improvement-item">
+                            <div><span class="badge badge-rivezli">→ Notifications</span></div>
+                            <div class="text-sm">RabbitMQ: envoi des notifications</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 class="mb-4">📡 Communication RabbitMQ</h3>
+                        <h4 class="text-sm mb-2">Consumer Queue: <code>user-service-queue</code></h4>
+                        <div class="code-block">
+// Message reçu pour wallet update
+{
+  "type": "CREDIT_WALLET" | "DEBIT_WALLET",
+  "userId": "ObjectId",
+  "amount": Number,
+  "reason": "purchase" | "recharge" | "bank",
+  "transactionId": "String"
+}
+
+// Socket.io Events émis
+- "userConnectionStatusUpdated"
+- "logoutUser"
+- "banUser"
+- "walletUpdated"
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COURSES SERVICE DETAIL -->
+        <section id="service-courses-detail" class="section-dark">
+            <div class="container">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); width: 64px; height: 64px; font-size: 2rem;">📚</div>
+                    <div>
+                        <h2 class="gradient-text">Courses Service</h2>
+                        <p class="text-gray">Service de gestion des contenus pédagogiques</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-2 mb-6">
+                    <div class="card">
+                        <h3 class="mb-4">🎯 Rôle et Responsabilités</h3>
+                        <ul style="padding-left: 1.5rem;">
+                            <li class="mb-2"><strong>Cours:</strong> CRUD complet avec visibilité</li>
+                            <li class="mb-2"><strong>Chapitres:</strong> Vidéos, PDFs, contenus</li>
+                            <li class="mb-2"><strong>Packs:</strong> Bundles de cours avec remises</li>
+                            <li class="mb-2"><strong>Lives:</strong> Sessions en direct programmées</li>
+                            <li class="mb-2"><strong>Progress:</strong> Suivi de progression étudiant</li>
+                            <li class="mb-2"><strong>Coupons:</strong> Codes promo avec expiration</li>
+                            <li class="mb-2"><strong>Promos:</strong> Offres promotionnelles</li>
+                            <li class="mb-2"><strong>Themes:</strong> Organisation par thèmes (Droit)</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 class="mb-4">⚙️ Stack Technique</h3>
+                        <table>
+                            <tr><td>Runtime</td><td>Node.js 20 LTS</td></tr>
+                            <tr><td>Framework</td><td>Express.js 4.x</td></tr>
+                            <tr><td>Language</td><td>TypeScript 5.x</td></tr>
+                            <tr><td>Database</td><td>MongoDB Atlas (Mongoose)</td></tr>
+                            <tr><td>File Storage</td><td>BunnyCDN (Videos, PDFs)</td></tr>
+                            <tr><td>Local Upload</td><td>Multer</td></tr>
+                            <tr><td>Cron Jobs</td><td>node-cron (expirations)</td></tr>
+                            <tr><td>Ports</td><td>5032 (test) / 5033 (prod)</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card mb-6">
+                    <h3 class="mb-4">📊 Modèles de Données</h3>
+                    <div class="grid grid-3">
+                        <div>
+                            <h4 style="color: var(--rivezli);">Course Schema</h4>
+                            <div class="code-block" style="font-size: 0.7rem;">
+{
+  courseId: String,
+  course_name: String,
+  course_category: String,
+  course_niveau: String,
+  course_section: String,
+  course_description: String,
+  course_cover_img: String,
+  course_intro_video: String,
+  course_price_one_month: Number,
+  course_price_two_months: Number,
+  // ... jusqu'à 12 mois
+  isVisible: Boolean,
+  added_by: String,
+  instructor_name: String,
+  instructor_description: String,
+  instructor_img: String,
+  isFormation: Boolean,
+  course_themes: [String]
+}
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--rivezli);">Chapter Schema</h4>
+                            <div class="code-block" style="font-size: 0.7rem;">
+{
+  chapter_name: String,
+  chapter_description: String,
+  courseId: String,
+  isFree: Boolean,
+  order: Number,
+  theme: String,
+  videos: [{
+    videoId: String,
+    video_name: String,
+    video_description: String,
+    videoUrl: String,
+    order: Number,
+    duration: Number
+  }],
+  pdfs: [{
+    pdfId: String,
+    pdf_name: String,
+    pdf_description: String,
+    pdfUrl: String,
+    order: Number
+  }],
+  introPdfs: [{ ... }]
+}
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--rivezli);">UserCourses Schema</h4>
+                            <div class="code-block" style="font-size: 0.7rem;">
+{
+  user_id: String,
+  user_courses: [{
+    courseId: String,
+    purchasedAt: Date,
+    expiresAt: Date,
+    purchaseType: String,
+    progress: [{
+      chapterId: String,
+      contents: [{
+        contentId: String,
+        contentType: String,
+        isDone: Boolean,
+        doneAt: Date
+      }]
+    }]
+  }]
+}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-6">
+                    <h3 class="mb-4">🔌 Endpoints API (85+ endpoints)</h3>
+                    <div class="grid grid-2">
+                        <div>
+                            <h4 style="color: #22c55e;">📖 Endpoints Étudiant</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li><code>POST /purchase_course/:courseId</code></li>
+                                <li><code>GET /get_purchased_course</code></li>
+                                <li><code>GET /get_recommended_courses</code></li>
+                                <li><code>GET /get_related_courses</code></li>
+                                <li><code>GET /get_chapter_content_student/:courseId/:chapterId</code></li>
+                                <li><code>PUT /mark_done_content/:chapterId/:contentId/...</code></li>
+                                <li><code>GET /get_progress_chapter_student/:courseId/:chapterId</code></li>
+                                <li><code>GET /get_student_lives</code></li>
+                                <li><code>GET /get_user_formations</code></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: #f59e0b;">🔧 Endpoints Admin</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li><code>POST /add_course</code> (multipart)</li>
+                                <li><code>POST /add_chapter_course/:courseId</code></li>
+                                <li><code>POST /add_video_chapter/:chapterId</code></li>
+                                <li><code>POST /add_pdf_chapter/:chapterId</code></li>
+                                <li><code>PUT /update_course/:courseId</code></li>
+                                <li><code>PUT /change_course_visibility/:courseId</code></li>
+                                <li><code>DELETE /delete_course/:courseId</code></li>
+                                <li><code>PUT /reorder_chapters/:courseId</code></li>
+                                <li><code>POST /add_live</code></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: #3b82f6;">📦 Endpoints Packs</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li><code>POST /pack/create</code></li>
+                                <li><code>PUT /pack/edit/:packId</code></li>
+                                <li><code>POST /pack/purchase/:packId</code></li>
+                                <li><code>GET /pack/list</code></li>
+                                <li><code>GET /pack/recommended</code></li>
+                                <li><code>PUT /pack/sync/:packId</code></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: #ec4899;">🎫 Endpoints Coupons/Promos</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li><code>POST /coupon/create</code></li>
+                                <li><code>POST /coupon/purchase/:courseId</code></li>
+                                <li><code>GET /coupon/check/:code</code></li>
+                                <li><code>POST /promo/create</code></li>
+                                <li><code>GET /promo/notifications</code></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <h3 class="mb-4">🔗 Dépendances & Communication</h3>
+                        <div class="improvement-item">
+                            <div><span class="badge badge-rivezli">→ User</span></div>
+                            <div class="text-sm">HTTP: Vérifie/débite wallet pour achats</div>
+                        </div>
+                        <div class="improvement-item">
+                            <div><span class="badge badge-rivezli">→ Notifications</span></div>
+                            <div class="text-sm">RabbitMQ: Notifie achat, lives, promos</div>
+                        </div>
+                        <div class="improvement-item">
+                            <div><span class="badge badge-rivezli">→ BunnyCDN</span></div>
+                            <div class="text-sm">HTTP: Upload/Delete vidéos et PDFs</div>
+                        </div>
+                        <div class="improvement-item">
+                            <div><span class="badge badge-rivezli">← Quiz</span></div>
+                            <div class="text-sm">HTTP: Association quiz aux chapitres</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 class="mb-4">⏰ Cron Jobs</h3>
+                        <div class="code-block">
+// Exécuté toutes les heures
+cron.schedule('0 * * * *', async () => {
+  // Supprimer les cours expirés des étudiants
+  await deleteExpiredCoursesUser();
+  
+  // Supprimer les coupons expirés
+  await deleteExpiredCoupon();
+  
+  // Supprimer les promos expirées
+  await deleteExpiredPromo();
+});
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CATEGORY SERVICE DETAIL -->
+        <section id="service-category-detail" class="section-darker">
+            <div class="container">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #22c55e, #16a34a); width: 64px; height: 64px; font-size: 2rem;">📁</div>
+                    <div>
+                        <h2 class="gradient-text">Category Service</h2>
+                        <p class="text-gray">Service de gestion de la taxonomie éducative</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-2 mb-6">
+                    <div class="card">
+                        <h3 class="mb-4">🎯 Rôle et Responsabilités</h3>
+                        <ul style="padding-left: 1.5rem;">
+                            <li class="mb-2"><strong>Catégories:</strong> Prepa, BAC, Concours, etc.</li>
+                            <li class="mb-2"><strong>Niveaux:</strong> 1ère année, 2ème année, etc.</li>
+                            <li class="mb-2"><strong>Sections:</strong> MP, PC, SI, Lettres, etc.</li>
+                            <li class="mb-2"><strong>Visibilité:</strong> Activation/désactivation</li>
+                            <li class="mb-2"><strong>Images:</strong> Couvertures des catégories</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 class="mb-4">📊 Modèle Category</h3>
+                        <div class="code-block">
+{
+  category_cover_img: String (required),
+  category_name: String (unique, required),
+  niveau: [{
+    niveau_name: String (required),
+    sections: [String] (required)
+  }],
+  isVisible: Boolean (default: false),
+  timestamps: { createdAt, updatedAt }
+}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="mb-4">🔌 Endpoints API</h3>
+                    <table>
+                        <thead>
+                            <tr><th>Méthode</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/add_category</code></td>
+                                <td>Admin</td>
+                                <td>Créer une catégorie</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/add_niveau_category/:categoryId</code></td>
+                                <td>Admin</td>
+                                <td>Ajouter un niveau</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/add_section_niveau/:categoryId/:niveauIndex</code></td>
+                                <td>Admin</td>
+                                <td>Ajouter une section</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_categories</code></td>
+                                <td>-</td>
+                                <td>Liste catégories visibles</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_all_categories</code></td>
+                                <td>Admin</td>
+                                <td>Toutes les catégories</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_category_niveau/:categoryId</code></td>
+                                <td>-</td>
+                                <td>Niveaux d'une catégorie</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_niveau_sections/:categoryId/:niveauIndex</code></td>
+                                <td>-</td>
+                                <td>Sections d'un niveau</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-info">PUT</span></td>
+                                <td><code>/update_category_visibility/:categoryId</code></td>
+                                <td>Admin</td>
+                                <td>Toggle visibilité</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-danger">DELETE</span></td>
+                                <td><code>/delete_category/:categoryId</code></td>
+                                <td>SuperAdmin</td>
+                                <td>Supprimer catégorie</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACHATS SERVICE DETAIL -->
+        <section id="service-achats-detail" class="section-dark">
+            <div class="container">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706); width: 64px; height: 64px; font-size: 2rem;">🛒</div>
+                    <div>
+                        <h2 class="gradient-text">Achats Service</h2>
+                        <p class="text-gray">Service d'historique et statistiques des achats</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-2 mb-6">
+                    <div class="card">
+                        <h3 class="mb-4">🎯 Rôle et Responsabilités</h3>
+                        <ul style="padding-left: 1.5rem;">
+                            <li class="mb-2"><strong>Historique:</strong> Tous les achats de cours/packs</li>
+                            <li class="mb-2"><strong>Stats Admin:</strong> Revenus, tendances</li>
+                            <li class="mb-2"><strong>Stats Étudiant:</strong> Ses propres achats</li>
+                            <li class="mb-2"><strong>Analytics:</strong> Par année, catégorie, cours</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 class="mb-4">📊 Modèle Achat</h3>
+                        <div class="code-block">
+{
+  achat_by: ObjectId (ref: User),
+  studentId: Number,
+  userName: String,
+  achatItem: String,       // Course or Pack ID
+  achatItemName: String,
+  itemType: "course" | "pack",
+  achat_price: Number,
+  category: String,
+  niveau: String,
+  section: String,
+  timestamps
+}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="mb-4">🔌 Endpoints API</h3>
+                    <table>
+                        <thead><tr><th>Méthode</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_admin_achats</code></td>
+                                <td>Supervisor</td>
+                                <td>Tous les achats (admin)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_admin_achats_today</code></td>
+                                <td>Supervisor</td>
+                                <td>Achats du jour</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_student_achats</code></td>
+                                <td>Student</td>
+                                <td>Mes achats</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_student_achats_admin/:_id</code></td>
+                                <td>Supervisor</td>
+                                <td>Achats d'un étudiant</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_stats_achat/:year/:typeAchat/:category?</code></td>
+                                <td>SuperAdmin</td>
+                                <td>Stats par année</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_stats_item/:year/:itemId/:itemType/:filterType</code></td>
+                                <td>SuperAdmin</td>
+                                <td>Stats par item</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_achat_prepa</code></td>
+                                <td>Supervisor</td>
+                                <td>Achats catégorie Prepa</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- RECHARGES SERVICE DETAIL -->
+        <section id="service-recharges-detail" class="section-darker">
+            <div class="container">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #ec4899, #be185d); width: 64px; height: 64px; font-size: 2rem;">💳</div>
+                    <div>
+                        <h2 class="gradient-text">Recharges Service</h2>
+                        <p class="text-gray">Service de gestion des codes de recharge wallet</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-2 mb-6">
+                    <div class="card">
+                        <h3 class="mb-4">🎯 Rôle et Responsabilités</h3>
+                        <ul style="padding-left: 1.5rem;">
+                            <li class="mb-2"><strong>Validation:</strong> Vérification codes de recharge</li>
+                            <li class="mb-2"><strong>Crédit Wallet:</strong> Via RabbitMQ vers User Service</li>
+                            <li class="mb-2"><strong>Historique:</strong> Toutes les recharges</li>
+                            <li class="mb-2"><strong>Stats:</strong> Recharges par année</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 class="mb-4">📊 Modèle Recharge</h3>
+                        <div class="code-block">
+{
+  userId: ObjectId (ref: User),
+  studentId: Number,
+  rechargeId: String (unique),
+  userName: String,
+  amount: Number,
+  timestamps
+}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-6">
+                    <h3 class="mb-4">🔌 Endpoints API</h3>
+                    <table>
+                        <thead><tr><th>Méthode</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/check_recharge</code></td>
+                                <td>Student</td>
+                                <td>Valider un code de recharge</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_recharges_admin</code></td>
+                                <td>Supervisor</td>
+                                <td>Toutes les recharges</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_recharges_today_admin</code></td>
+                                <td>Supervisor</td>
+                                <td>Recharges du jour</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_student_recharges</code></td>
+                                <td>Student</td>
+                                <td>Mes recharges</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_recharges_year/:year</code></td>
+                                <td>SuperAdmin</td>
+                                <td>Stats par année</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h3 class="mb-4">📡 Communication RabbitMQ</h3>
+                    <div class="code-block">
+// Après validation d'un code de recharge, envoi vers User Service
+await publishToQueue('user-service-queue', {
+  type: 'CREDIT_WALLET',
+  userId: user._id,
+  amount: rechargeAmount,
+  reason: 'recharge',
+  rechargeId: code
+});
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NOTIFICATIONS SERVICE DETAIL -->
+        <section id="service-notifications-detail" class="section-dark">
+            <div class="container">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626); width: 64px; height: 64px; font-size: 2rem;">🔔</div>
+                    <div>
+                        <h2 class="gradient-text">Notifications Service</h2>
+                        <p class="text-gray">Service de notifications temps réel</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-2 mb-6">
+                    <div class="card">
+                        <h3 class="mb-4">🎯 Rôle et Responsabilités</h3>
+                        <ul style="padding-left: 1.5rem;">
+                            <li class="mb-2"><strong>Consumer RabbitMQ:</strong> Écoute les messages</li>
+                            <li class="mb-2"><strong>Push Socket.io:</strong> Envoi temps réel</li>
+                            <li class="mb-2"><strong>Filtrage:</strong> Par niveau/section</li>
+                            <li class="mb-2"><strong>Historique:</strong> Stockage des notifications</li>
+                            <li class="mb-2"><strong>Vues:</strong> Tracking des lectures</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 class="mb-4">📊 Modèle Notification</h3>
+                        <div class="code-block">
+{
+  users_Ids: [ObjectId],
+  viewed_users_Ids: [ObjectId],
+  notification_text: String,
+  isTypeAchat: Boolean,
+  isTypeRecharge: Boolean,
+  isTypeAuth: Boolean,
+  isTypeLive: Boolean,
+  isTypeCourse: Boolean,
+  isTypeDemandeRecharge: Boolean,
+  isTypeAffectationPoints: Boolean,
+  isTypeAffectationCourse: Boolean,
+  isTypeSurvey: Boolean,
+  timestamps
+}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <h3 class="mb-4">🔌 Endpoints API</h3>
+                        <table>
+                            <thead><tr><th>Méthode</th><th>Endpoint</th><th>Description</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge badge-warning">GET</span></td>
+                                    <td><code>/get_student_notifications</code></td>
+                                    <td>Mes notifications</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-info">PUT</span></td>
+                                    <td><code>/view_notifications</code></td>
+                                    <td>Marquer comme vues</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card">
+                        <h3 class="mb-4">📡 Socket.io Events</h3>
+                        <div class="code-block">
+// Events émis vers les clients
+io.emit('purchase_notification', {...})
+io.emit('recharge_notification', {...})
+io.emit('live_notification', {...})
+io.emit('survey_notification', {...})
+io.emit('promo_notification', {...})
+
+// Consumer RabbitMQ Queue
+Queue: 'notifications-service-queue'
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BANKPAYMENT SERVICE DETAIL -->
+        <section id="service-bankpayment-detail" class="section-darker">
+            <div class="container">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #6366f1, #4338ca); width: 64px; height: 64px; font-size: 2rem;">🏦</div>
+                    <div>
+                        <h2 class="gradient-text">BankPayment Service</h2>
+                        <p class="text-gray">Service de gestion des versements bancaires</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-2 mb-6">
+                    <div class="card">
+                        <h3 class="mb-4">🎯 Rôle et Responsabilités</h3>
+                        <ul style="padding-left: 1.5rem;">
+                            <li class="mb-2"><strong>Upload:</strong> Reçus de versement (images)</li>
+                            <li class="mb-2"><strong>Validation:</strong> Approbation/Refus admin</li>
+                            <li class="mb-2"><strong>Crédit:</strong> Wallet après approbation</li>
+                            <li class="mb-2"><strong>Historique:</strong> Tous les versements</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 class="mb-4">📊 Modèle Versementbancaire</h3>
+                        <div class="code-block">
+{
+  userId: String,
+  studentId: String,
+  userName: String,
+  receive: String,        // Image URL
+  receiveId: String,      // BunnyCDN ID
+  amount: Number,
+  treatedBy: String,      // Admin who treated
+  isApproved: Boolean,
+  timestamps
+}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="mb-4">🔌 Endpoints API</h3>
+                    <table>
+                        <thead><tr><th>Méthode</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/add_payment_receipt</code></td>
+                                <td>Student</td>
+                                <td>Soumettre un reçu</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_payment_receipts</code></td>
+                                <td>Supervisor</td>
+                                <td>Liste des demandes</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_one_payment_receipt/:id</code></td>
+                                <td>Supervisor</td>
+                                <td>Détails d'une demande</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-info">PUT</span></td>
+                                <td><code>/approve_payment_receipt/:id</code></td>
+                                <td>Supervisor</td>
+                                <td>Approuver (+ crédit wallet)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-info">PUT</span></td>
+                                <td><code>/deny_payment_receipt/:id</code></td>
+                                <td>Supervisor</td>
+                                <td>Refuser</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUIZ SERVICE DETAIL -->
+        <section id="service-quiz-detail" class="section-dark">
+            <div class="container">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #14b8a6, #0d9488); width: 64px; height: 64px; font-size: 2rem;">❓</div>
+                    <div>
+                        <h2 class="gradient-text">Quiz Service</h2>
+                        <p class="text-gray">Service de quiz pour les chapitres de cours</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-2 mb-6">
+                    <div class="card">
+                        <h3 class="mb-4">🎯 Rôle et Responsabilités</h3>
+                        <ul style="padding-left: 1.5rem;">
+                            <li class="mb-2"><strong>Création:</strong> Quiz avec questions/réponses</li>
+                            <li class="mb-2"><strong>Association:</strong> Lier quiz aux chapitres</li>
+                            <li class="mb-2"><strong>Soumission:</strong> Réponses des étudiants</li>
+                            <li class="mb-2"><strong>Scoring:</strong> Calcul automatique des notes</li>
+                            <li class="mb-2"><strong>Images:</strong> Questions avec images</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 class="mb-4">📊 Modèle Quiz</h3>
+                        <div class="code-block">
+{
+  quizId: String,
+  quizName: String,
+  quizTime: Number (minutes),
+  quizQuestionsResponses: [{
+    _id: ObjectId,
+    question: String,
+    questionImg: String,
+    questionResponses: [{
+      response: String,
+      correct: Boolean
+    }]
+  }],
+  added_by: String,
+  timestamps
+}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="mb-4">🔌 Endpoints API</h3>
+                    <table>
+                        <thead><tr><th>Méthode</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/create_quiz</code></td>
+                                <td>Admin</td>
+                                <td>Créer un quiz</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/add_quiz_question/:quizId</code></td>
+                                <td>Admin</td>
+                                <td>Ajouter une question</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/add_quiz_response/:quizId/:questionId</code></td>
+                                <td>Admin</td>
+                                <td>Ajouter une réponse</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/assign_quiz_chapter/:chapterId/:quizId</code></td>
+                                <td>Admin</td>
+                                <td>Associer au chapitre</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_all_quiz_admin</code></td>
+                                <td>Admin</td>
+                                <td>Liste des quiz</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/get_one_quiz_student/:quizId</code></td>
+                                <td>Student</td>
+                                <td>Quiz pour soumission</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/submit_quiz/:quizId</code></td>
+                                <td>Student</td>
+                                <td>Soumettre les réponses</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-danger">DELETE</span></td>
+                                <td><code>/delete_quiz/:quizId</code></td>
+                                <td>Admin</td>
+                                <td>Supprimer un quiz</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONCOURS SERVICE DETAIL -->
+        <section id="service-concours-detail" class="section-darker">
+            <div class="container">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #f97316, #ea580c); width: 64px; height: 64px; font-size: 2rem;">🏆</div>
+                    <div>
+                        <h2 class="gradient-text">Concours Service</h2>
+                        <p class="text-gray">Service Spring Boot de gestion des concours</p>
+                        <span class="badge badge-warning">Java 17 / Spring Boot 3</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-2 mb-6">
+                    <div class="card">
+                        <h3 class="mb-4">🎯 Rôle et Responsabilités</h3>
+                        <ul style="padding-left: 1.5rem;">
+                            <li class="mb-2"><strong>Concours:</strong> Création et gestion</li>
+                            <li class="mb-2"><strong>Quiz:</strong> Banques de questions par catégorie</li>
+                            <li class="mb-2"><strong>Randomization:</strong> Questions aléatoires</li>
+                            <li class="mb-2"><strong>Tentatives:</strong> Historique des participations</li>
+                            <li class="mb-2"><strong>Scoring:</strong> Notes et classement</li>
+                            <li class="mb-2"><strong>Pricing:</strong> Tarification par durée</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 class="mb-4">⚙️ Stack Technique</h3>
+                        <table>
+                            <tr><td>Framework</td><td>Spring Boot 3.3.11</td></tr>
+                            <tr><td>Language</td><td>Java 17</td></tr>
+                            <tr><td>Database</td><td>MySQL 8.0</td></tr>
+                            <tr><td>ORM</td><td>Hibernate / JPA</td></tr>
+                            <tr><td>Security</td><td>Spring Security + JWT</td></tr>
+                            <tr><td>Build</td><td>Maven</td></tr>
+                            <tr><td>CDN</td><td>BunnyCDN</td></tr>
+                            <tr><td>Ports</td><td>8080 (test) / 8081 (prod)</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card mb-6">
+                    <h3 class="mb-4">📊 Entités JPA</h3>
+                    <div class="grid grid-2">
+                        <div>
+                            <h4 style="color: var(--rivezli);">Concours Entity</h4>
+                            <div class="code-block" style="font-size: 0.7rem;">
+@Entity
+public class Concours {
+  @Id UUID id;
+  String title;
+  String description;
+  int timeInMinutes;
+  String addedBy;
+  String concourImgURL;
+  String langue; // ARABIC or FRENCH
+  
+  // Pricing (1-12 months)
+  double concourPriceOneMonth;
+  double concourPriceTwoMonths;
+  // ...
+  
+  @OneToMany
+  List&lt;ConcoursQuiz&gt; quizLinks;
+}
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--rivezli);">Quiz & Question Entities</h4>
+                            <div class="code-block" style="font-size: 0.7rem;">
+@Entity
+public class Quiz {
+  @Id UUID id;
+  String title;
+  String category;
+  int numberOfQuestionsToSelect;
+  
+  @OneToMany
+  List&lt;Question&gt; questions;
+}
+
+@Entity
+public class Question {
+  @Id UUID id;
+  String questionText;
+  String imageUrl;
+  
+  @OneToMany
+  List&lt;Response&gt; responses;
+}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="mb-4">🔌 REST API Endpoints</h3>
+                    <table>
+                        <thead><tr><th>Méthode</th><th>Endpoint</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/api/concours/create</code></td>
+                                <td>Créer un concours (multipart)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/api/concours/all</code></td>
+                                <td>Liste des concours</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/api/concours/assign-quiz</code></td>
+                                <td>Associer quiz au concours</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/api/concours/{id}/assigned-quizzes</code></td>
+                                <td>Quiz d'un concours</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/api/concours/{id}/random-questions</code></td>
+                                <td>Questions aléatoires</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/api/concours/submit</code></td>
+                                <td>Soumettre les réponses</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-warning">GET</span></td>
+                                <td><code>/api/concours/{id}/attempts</code></td>
+                                <td>Tentatives utilisateur</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-danger">DELETE</span></td>
+                                <td><code>/api/concours/{id}</code></td>
+                                <td>Supprimer un concours</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/api/quiz/create</code></td>
+                                <td>Créer une banque de questions</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge badge-success">POST</span></td>
+                                <td><code>/api/quiz/{id}/add-question</code></td>
+                                <td>Ajouter une question</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SONDAGE SERVICE DETAIL -->
+        <section id="service-sondage-detail" class="section-dark">
+            <div class="container">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2); width: 64px; height: 64px; font-size: 2rem;">📊</div>
+                    <div>
+                        <h2 class="gradient-text">Sondage Service</h2>
+                        <p class="text-gray">Service d'enquêtes et sondages ciblés</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-2 mb-6">
+                    <div class="card">
+                        <h3 class="mb-4">🎯 Rôle et Responsabilités</h3>
+                        <ul style="padding-left: 1.5rem;">
+                            <li class="mb-2"><strong>Création:</strong> Sondages multi-types</li>
+                            <li class="mb-2"><strong>Ciblage:</strong> Par catégorie, niveau, section, cours</li>
+                            <li class="mb-2"><strong>Types:</strong> Rating, QCM, Texte court/long</li>
+                            <li class="mb-2"><strong>Real-time:</strong> Résultats en direct</li>
+                            <li class="mb-2"><strong>Export:</strong> PDF des résultats</li>
+                            <li class="mb-2"><strong>Stats:</strong> Analytics avancés</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h3 class="mb-4">📊 Modèle Survey</h3>
+                        <div class="code-block" style="font-size: 0.7rem;">
+{
+  title: String,
+  description: String,
+  status: "DRAFT" | "ACTIVE" | "ARCHIVED",
+  targeting: {
+    allCategories: Boolean,
+    categories: [String],
+    levels: [String],
+    sections: [String],
+    targetByCourseEnrollment: Boolean,
+    courseIds: [String],
+    packIds: [String],
+    specificStudents: [ObjectId]
+  },
+  settings: {
+    isMandatory: Boolean,
+    showOnce: Boolean,
+    minResponses: Number
+  },
+  questions: [{
+    id: String,
+    type: "RATING_STARS" | "RATING_NUMERIC" 
+          | "QCM_SINGLE" | "QCM_MULTIPLE"
+          | "TEXT_SHORT" | "TEXT_LONG",
+    label: String,
+    required: Boolean,
+    scale: Number,
+    options: [String],
+    order: Number
+  }],
+  startDate: Date,
+  endDate: Date,
+  createdBy: ObjectId
+}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-6">
+                    <h3 class="mb-4">🔌 Endpoints API (~20 endpoints)</h3>
+                    <div class="grid grid-2">
+                        <div>
+                            <h4 style="color: #f59e0b;">🔧 Admin Endpoints</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li><code>POST /surveys</code> - Créer un sondage</li>
+                                <li><code>PUT /surveys/:id</code> - Modifier</li>
+                                <li><code>DELETE /surveys/:id</code> - Supprimer</li>
+                                <li><code>PUT /surveys/:id/status</code> - Changer statut</li>
+                                <li><code>GET /surveys</code> - Liste admin</li>
+                                <li><code>GET /surveys/:id/results</code> - Résultats</li>
+                                <li><code>GET /surveys/:id/results/pdf</code> - Export PDF</li>
+                                <li><code>GET /surveys/:id/stats</code> - Statistiques</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: #22c55e;">📖 Student Endpoints</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li><code>GET /surveys/student/active</code> - Sondages actifs</li>
+                                <li><code>GET /surveys/student/pending</code> - À remplir</li>
+                                <li><code>GET /surveys/student/answered</code> - Déjà répondus</li>
+                                <li><code>GET /surveys/:id/student</code> - Détails</li>
+                                <li><code>POST /surveys/:id/responses</code> - Soumettre</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <h3 class="mb-4">📡 Real-time Socket.io</h3>
+                        <div class="code-block">
+// Events émis pour le dashboard admin
+io.emit('survey-results-update', {
+  surveyId: String,
+  questionId: String,
+  newResponse: Object,
+  stats: {
+    totalResponses: Number,
+    completionRate: Number
+  }
+});
+
+// Notification nouveau sondage
+io.emit('survey_notification', {
+  surveyId: String,
+  title: String,
+  targetedUsers: [ObjectId]
+});
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 class="mb-4">🎯 Système de Ciblage</h3>
+                        <p class="text-sm text-gray mb-4">Le sondage peut cibler les étudiants par:</p>
+                        <ul class="text-sm" style="padding-left: 1.5rem;">
+                            <li class="mb-2">✅ Toutes les catégories</li>
+                            <li class="mb-2">✅ Catégories spécifiques (Prepa, BAC...)</li>
+                            <li class="mb-2">✅ Niveaux spécifiques (1ère, 2ème...)</li>
+                            <li class="mb-2">✅ Sections spécifiques (MP, PC...)</li>
+                            <li class="mb-2">✅ Inscrits à des cours spécifiques</li>
+                            <li class="mb-2">✅ Inscrits à des packs spécifiques</li>
+                            <li class="mb-2">✅ Étudiants spécifiques par ID</li>
+                            <li class="mb-2">✅ Intersection des critères</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SWOT Analysis -->
+        <section id="swot" class="section-dark">
+            <div class="container">
+                <div class="text-center mb-8">
+                    <h2>Analyse <span class="gradient-text">SWOT</span></h2>
+                    <p>Forces, Faiblesses, Opportunités et Menaces de la plateforme</p>
+                </div>
+
+                <div class="swot-grid">
+                    <div class="swot-card swot-strengths">
+                        <h3 style="color: #22c55e;">💪 Forces</h3>
+                        <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                            <li class="mb-2">Architecture microservices bien découplée</li>
+                            <li class="mb-2">Communication asynchrone via RabbitMQ</li>
+                            <li class="mb-2">Real-time notifications avec Socket.io + Redis adapter</li>
+                            <li class="mb-2">Système de rôles granulaire (Student, Admin, Supervisor, SuperAdmin)</li>
+                            <li class="mb-2">JWT avec refresh token pour l'authentification</li>
+                            <li class="mb-2">Rate limiting avec Redis store</li>
+                            <li class="mb-2">CDN BunnyCDN pour les médias</li>
+                            <li class="mb-2">Docker containerization pour tous les services</li>
+                            <li class="mb-2">PM2 process management avec clustering</li>
+                            <li class="mb-2">TypeScript partout pour la type safety</li>
+                        </ul>
+                    </div>
+
+                    <div class="swot-card swot-weaknesses">
+                        <h3 style="color: #ef4444;">⚠️ Faiblesses</h3>
+                        <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                            <li class="mb-2">Pas d'API Gateway centralisé</li>
+                            <li class="mb-2">Duplication de code entre services (middlewares)</li>
+                            <li class="mb-2">Manque de tests automatisés</li>
+                            <li class="mb-2">Pas de circuit breaker pour les appels inter-services</li>
+                            <li class="mb-2">Logging non centralisé (pas d'ELK stack)</li>
+                            <li class="mb-2">Monitoring limité (pas de Prometheus/Grafana)</li>
+                            <li class="mb-2">Pas de service mesh (Istio/Linkerd)</li>
+                            <li class="mb-2">Documentation API incomplète (OpenAPI partiel)</li>
+                            <li class="mb-2">Gestion d'erreurs inconsistante entre services</li>
+                            <li class="mb-2">Pas de système de versioning d'API</li>
+                        </ul>
+                    </div>
+
+                    <div class="swot-card swot-opportunities">
+                        <h3 style="color: #3b82f6;">🚀 Opportunités</h3>
+                        <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                            <li class="mb-2">Marché e-learning en croissance en Tunisie</li>
+                            <li class="mb-2">Possibilité d'ajouter des cours en live interactifs</li>
+                            <li class="mb-2">Intégration de paiement mobile (Flouci, D17)</li>
+                            <li class="mb-2">Application mobile native (React Native)</li>
+                            <li class="mb-2">Système de gamification avancé</li>
+                            <li class="mb-2">AI-powered recommendations</li>
+                            <li class="mb-2">Certification blockchain</li>
+                            <li class="mb-2">Marketplace pour instructeurs externes</li>
+                            <li class="mb-2">Partenariats avec universités</li>
+                        </ul>
+                    </div>
+
+                    <div class="swot-card swot-threats">
+                        <h3 style="color: #f59e0b;">⚡ Menaces</h3>
+                        <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                            <li class="mb-2">Concurrence croissante (Udemy, Coursera localisés)</li>
+                            <li class="mb-2">Dépendance aux services cloud externes</li>
+                            <li class="mb-2">Risques de sécurité (OWASP Top 10)</li>
+                            <li class="mb-2">Single point of failure sur MongoDB Atlas</li>
+                            <li class="mb-2">Scalabilité limitée sans Kubernetes</li>
+                            <li class="mb-2">Coûts CDN croissants avec le scale</li>
+                            <li class="mb-2">Réglementations data privacy (GDPR-like)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Strengths & Weaknesses per Service -->
+        <section id="strengths-weaknesses" class="section-darker">
+            <div class="container">
+                <div class="text-center mb-8">
+                    <h2>Analyse par <span class="gradient-text">Service</span></h2>
+                    <p>Évaluation détaillée de chaque microservice</p>
+                </div>
+
+                <div class="grid grid-2">
+                    <!-- User Service -->
+                    <div class="card">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="service-icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">👤</div>
+                            <h3>User Service</h3>
+                        </div>
+                        <div class="mb-4">
+                            <h4 style="color: #22c55e;">✅ Points forts</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li>JWT + Refresh token bien implémenté</li>
+                                <li>RabbitMQ consumer pour wallet updates</li>
+                                <li>Socket.io avec Redis adapter</li>
+                                <li>Gestion multi-rôles granulaire</li>
+                                <li>Email verification flow</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: #ef4444;">❌ Points faibles</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li>Pas de 2FA</li>
+                                <li>Password reset token en DB (devrait être JWT)</li>
+                                <li>Pas de rate limit sur login</li>
+                                <li>Pas d'audit log des actions admin</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-sm text-gray">Score global:</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-green" style="width: 75%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Courses Service -->
+                    <div class="card">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="service-icon" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9);">📚</div>
+                            <h3>Courses Service</h3>
+                        </div>
+                        <div class="mb-4">
+                            <h4 style="color: #22c55e;">✅ Points forts</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li>CRUD complet cours/chapitres/packs</li>
+                                <li>BunnyCDN pour vidéos et PDFs</li>
+                                <li>Système de coupons et promos</li>
+                                <li>Progress tracking par étudiant</li>
+                                <li>Cron jobs pour expiration</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: #ef4444;">❌ Points faibles</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li>Pas de streaming adaptatif (HLS/DASH)</li>
+                                <li>Pas de protection DRM</li>
+                                <li>Search basique (devrait utiliser Elasticsearch)</li>
+                                <li>Pas de versioning des contenus</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-sm text-gray">Score global:</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-green" style="width: 70%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications Service -->
+                    <div class="card">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="service-icon" style="background: linear-gradient(135deg, #ef4444, #dc2626);">🔔</div>
+                            <h3>Notifications Service</h3>
+                        </div>
+                        <div class="mb-4">
+                            <h4 style="color: #22c55e;">✅ Points forts</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li>Consumer RabbitMQ robuste</li>
+                                <li>Push temps réel via Socket.io</li>
+                                <li>Filtrage par niveau/section</li>
+                                <li>Historique des notifications</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: #ef4444;">❌ Points faibles</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li>Pas de push notifications mobile (FCM)</li>
+                                <li>Pas de notifications email</li>
+                                <li>Pas de préférences utilisateur</li>
+                                <li>Pas de batching pour les notifications en masse</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-sm text-gray">Score global:</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-yellow" style="width: 60%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Concours Service -->
+                    <div class="card">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="service-icon" style="background: linear-gradient(135deg, #f97316, #ea580c);">🏆</div>
+                            <h3>Concours Service (Spring Boot)</h3>
+                        </div>
+                        <div class="mb-4">
+                            <h4 style="color: #22c55e;">✅ Points forts</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li>Spring Boot robuste</li>
+                                <li>MySQL pour données relationnelles</li>
+                                <li>Questions aléatoires par niveau</li>
+                                <li>Historique des tentatives</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: #ef4444;">❌ Points faibles</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li>Pas d'intégration RabbitMQ</li>
+                                <li>Pas de leaderboard temps réel</li>
+                                <li>Auth séparée (devrait partager avec Node.js services)</li>
+                                <li>Pas de système anti-triche</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-sm text-gray">Score global:</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-yellow" style="width: 55%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recharges Service -->
+                    <div class="card">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="service-icon" style="background: linear-gradient(135deg, #ec4899, #be185d);">💳</div>
+                            <h3>Recharges Service</h3>
+                        </div>
+                        <div class="mb-4">
+                            <h4 style="color: #22c55e;">✅ Points forts</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li>Validation codes sécurisée</li>
+                                <li>Intégration RabbitMQ pour wallet</li>
+                                <li>Statistiques par année</li>
+                                <li>Historique complet</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: #ef4444;">❌ Points faibles</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li>Pas de génération automatique de codes</li>
+                                <li>Pas d'intégration paiement en ligne</li>
+                                <li>Pas de système de parrainage</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-sm text-gray">Score global:</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-green" style="width: 65%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sondage Service -->
+                    <div class="card">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="service-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">📊</div>
+                            <h3>Sondage Service</h3>
+                        </div>
+                        <div class="mb-4">
+                            <h4 style="color: #22c55e;">✅ Points forts</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li>Résultats temps réel via Socket.io</li>
+                                <li>Export CSV</li>
+                                <li>Filtrage par niveau/section</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 style="color: #ef4444;">❌ Points faibles</h4>
+                            <ul class="text-sm" style="padding-left: 1.5rem;">
+                                <li>Types de questions limités</li>
+                                <li>Pas de logique conditionnelle</li>
+                                <li>Pas d'analytics avancés</li>
+                                <li>Pas de templates réutilisables</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-sm text-gray">Score global:</span>
+                            <div class="progress-bar">
+                                <div class="progress-fill progress-yellow" style="width: 55%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Proposed Improvements -->
+        <section id="improvements" class="section-dark">
+            <div class="container">
+                <div class="text-center mb-8">
+                    <h2>Améliorations <span class="gradient-text">Proposées</span></h2>
+                    <p>Recommandations techniques pour améliorer la plateforme</p>
+                </div>
+
+                <div class="grid grid-2">
+                    <!-- High Priority -->
+                    <div class="card">
+                        <h3 style="color: #ef4444;" class="mb-4">🔴 Priorité Haute</h3>
+                        
+                        <div class="improvement-item">
+                            <div class="improvement-priority"><span class="badge badge-danger">Sécurité</span></div>
+                            <div>
+                                <h4>Ajouter 2FA (Two-Factor Authentication)</h4>
+                                <p class="text-sm text-gray">Implémenter TOTP avec Google Authenticator ou SMS OTP pour les comptes admin et optionnel pour les étudiants.</p>
+                            </div>
+                        </div>
+
+                        <div class="improvement-item">
+                            <div class="improvement-priority"><span class="badge badge-danger">Infra</span></div>
+                            <div>
+                                <h4>API Gateway (Kong ou AWS API Gateway)</h4>
+                                <p class="text-sm text-gray">Centraliser l'authentification, le rate limiting, et le routing. Ajouter un circuit breaker pattern.</p>
+                            </div>
+                        </div>
+
+                        <div class="improvement-item">
+                            <div class="improvement-priority"><span class="badge badge-danger">Monitoring</span></div>
+                            <div>
+                                <h4>Stack de monitoring (Prometheus + Grafana)</h4>
+                                <p class="text-sm text-gray">Métriques temps réel, alertes, dashboards pour tous les services.</p>
+                            </div>
+                        </div>
+
+                        <div class="improvement-item">
+                            <div class="improvement-priority"><span class="badge badge-danger">Logging</span></div>
+                            <div>
+                                <h4>Centralisation des logs (ELK Stack)</h4>
+                                <p class="text-sm text-gray">Elasticsearch + Logstash + Kibana pour l'agrégation et l'analyse des logs.</p>
+                            </div>
+                        </div>
+
+                        <div class="improvement-item">
+                            <div class="improvement-priority"><span class="badge badge-danger">Testing</span></div>
+                            <div>
+                                <h4>Tests automatisés (Jest + Supertest)</h4>
+                                <p class="text-sm text-gray">Unit tests, integration tests, et E2E tests avec coverage minimum de 70%.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Medium Priority -->
+                    <div class="card">
+                        <h3 style="color: #f59e0b;" class="mb-4">🟡 Priorité Moyenne</h3>
+
+                        <div class="improvement-item">
+                            <div class="improvement-priority"><span class="badge badge-warning">Perf</span></div>
+                            <div>
+                                <h4>Cache layer (Redis cache-aside pattern)</h4>
+                                <p class="text-sm text-gray">Cacher les données fréquemment accédées: cours populaires, catégories, profils utilisateurs.</p>
+                            </div>
+                        </div>
+
+                        <div class="improvement-item">
+                            <div class="improvement-priority"><span class="badge badge-warning">Search</span></div>
+                            <div>
+                                <h4>Elasticsearch pour la recherche</h4>
+                                <p class="text-sm text-gray">Recherche full-text avec suggestions, filtres avancés, et highlighting.</p>
+                            </div>
+                        </div>
+
+                        <div class="improvement-item">
+                            <div class="improvement-priority"><span class="badge badge-warning">Video</span></div>
+                            <div>
+                                <h4>Streaming adaptatif (HLS/DASH)</h4>
+                                <p class="text-sm text-gray">Adapter la qualité vidéo selon la bande passante. Ajouter DRM pour la protection.</p>
+                            </div>
+                        </div>
+
+                        <div class="improvement-item">
+                            <div class="improvement-priority"><span class="badge badge-warning">DevOps</span></div>
+                            <div>
+                                <h4>Kubernetes pour l'orchestration</h4>
+                                <p class="text-sm text-gray">Migration de Docker Compose vers K8s pour le scaling automatique et la haute disponibilité.</p>
+                            </div>
+                        </div>
+
+                        <div class="improvement-item">
+                            <div class="improvement-priority"><span class="badge badge-warning">API</span></div>
+                            <div>
+                                <h4>API Versioning</h4>
+                                <p class="text-sm text-gray">Implémenter /api/v1/, /api/v2/ pour la rétrocompatibilité.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Low Priority -->
+                    <div class="card">
+                        <h3 style="color: #22c55e;" class="mb-4">🟢 Priorité Basse</h3>
+
+                        <div class="improvement-item">
+                            <div class="improvement-priority"><span class="badge badge-success">DX</span></div>
+                            <div>
+                                <h4>Shared libraries package</h4>
+                                <p class="text-sm text-gray">Créer un package NPM privé pour les middlewares, types, et utilitaires communs.</p>
+                            </div>
+                        </div>
+
+                        <div class="improvement-item">
+                            <div class="improvement-priority"><span class="badge badge-success">Docs</span></div>
+                            <div>
+                                <h4>OpenAPI complète avec Swagger UI</h4>
+                                <p class="text-sm text-gray">Documentation interactive de toutes les APIs avec exemples et try-it-out.</p>
+                            </div>
+                        </div>
+
+                        <div class="improvement-item">
+                            <div class="improvement-priority"><span class="badge badge-success">Code</span></div>
+                            <div>
+                                <h4>Standardiser les réponses API</h4>
+                                <p class="text-sm text-gray">Format uniforme: { success, data, error, meta } pour toutes les réponses.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Architecture -->
+                    <div class="card">
+                        <h3 style="color: #3b82f6;" class="mb-4">🔵 Architecture</h3>
+
+                        <div class="improvement-item">
+                            <div class="improvement-priority"><span class="badge badge-info">Pattern</span></div>
+                            <div>
+                                <h4>Event Sourcing pour les transactions</h4>
+                                <p class="text-sm text-gray">Stocker tous les events de wallet comme source of truth pour audit et replay.</p>
+                            </div>
+                        </div>
+
+                        <div class="improvement-item">
+                            <div class="improvement-priority"><span class="badge badge-info">Pattern</span></div>
+                            <div>
+                                <h4>CQRS pour Courses Service</h4>
+                                <p class="text-sm text-gray">Séparer les queries (read) des commands (write) pour optimiser les performances.</p>
+                            </div>
+                        </div>
+
+                        <div class="improvement-item">
+                            <div class="improvement-priority"><span class="badge badge-info">Pattern</span></div>
+                            <div>
+                                <h4>Saga Pattern pour les transactions distribuées</h4>
+                                <p class="text-sm text-gray">Orchestrer les achats multi-services avec compensation en cas d'échec.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Features -->
+        <section id="new-features" class="section-darker">
+            <div class="container">
+                <div class="text-center mb-8">
+                    <h2>Nouvelles <span class="gradient-text">Fonctionnalités</span></h2>
+                    <p>Propositions pour enrichir la plateforme</p>
+                </div>
+
+                <div class="grid grid-3">
+                    <!-- Mobile App -->
+                    <div class="card">
+                        <div class="service-icon" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); margin-bottom: 1rem;">📱</div>
+                        <h3>Application Mobile</h3>
+                        <p class="text-sm text-gray mb-4">React Native pour iOS et Android avec téléchargement offline des cours.</p>
+                        <ul class="text-sm" style="padding-left: 1.5rem;">
+                            <li>Push notifications (FCM)</li>
+                            <li>Mode offline</li>
+                            <li>Vidéo player natif</li>
+                            <li>Biometric login</li>
+                        </ul>
+                        <div class="mt-4">
+                            <span class="badge badge-info">Effort: 3-4 mois</span>
+                        </div>
+                    </div>
+
+                    <!-- AI Features -->
+                    <div class="card">
+                        <div class="service-icon" style="background: linear-gradient(135deg, #8b5cf6, #ec4899); margin-bottom: 1rem;">🤖</div>
+                        <h3>AI & Machine Learning</h3>
+                        <p class="text-sm text-gray mb-4">Intelligence artificielle pour personnaliser l'expérience d'apprentissage.</p>
+                        <ul class="text-sm" style="padding-left: 1.5rem;">
+                            <li>Recommandations personnalisées</li>
+                            <li>Chatbot assistant</li>
+                            <li>Auto-génération de quiz</li>
+                            <li>Détection de difficulté</li>
+                        </ul>
+                        <div class="mt-4">
+                            <span class="badge badge-warning">Effort: 2-3 mois</span>
+                        </div>
+                    </div>
+
+                    <!-- Gamification -->
+                    <div class="card">
+                        <div class="service-icon" style="background: linear-gradient(135deg, #f59e0b, #ef4444); margin-bottom: 1rem;">🎮</div>
+                        <h3>Gamification Avancée</h3>
+                        <p class="text-sm text-gray mb-4">Système de récompenses pour augmenter l'engagement.</p>
+                        <ul class="text-sm" style="padding-left: 1.5rem;">
+                            <li>Badges et achievements</li>
+                            <li>Leaderboards hebdomadaires</li>
+                            <li>Streaks de connexion</li>
+                            <li>Points échangeables</li>
+                        </ul>
+                        <div class="mt-4">
+                            <span class="badge badge-success">Effort: 1-2 mois</span>
+                        </div>
+                    </div>
+
+                    <!-- Payment Gateway -->
+                    <div class="card">
+                        <div class="service-icon" style="background: linear-gradient(135deg, #22c55e, #14b8a6); margin-bottom: 1rem;">💰</div>
+                        <h3>Paiements en Ligne</h3>
+                        <p class="text-sm text-gray mb-4">Intégration des solutions de paiement tunisiennes.</p>
+                        <ul class="text-sm" style="padding-left: 1.5rem;">
+                            <li>Flouci</li>
+                            <li>D17</li>
+                            <li>Carte bancaire (Stripe)</li>
+                            <li>E-dinar</li>
+                        </ul>
+                        <div class="mt-4">
+                            <span class="badge badge-success">Effort: 1 mois</span>
+                        </div>
+                    </div>
+
+                    <!-- Live Interactive -->
+                    <div class="card">
+                        <div class="service-icon" style="background: linear-gradient(135deg, #ef4444, #f97316); margin-bottom: 1rem;">🎥</div>
+                        <h3>Live Interactif</h3>
+                        <p class="text-sm text-gray mb-4">Sessions en direct avec interaction en temps réel.</p>
+                        <ul class="text-sm" style="padding-left: 1.5rem;">
+                            <li>WebRTC streaming</li>
+                            <li>Chat en direct</li>
+                            <li>Q&A modéré</li>
+                            <li>Whiteboard partagé</li>
+                            <li>Screen sharing</li>
+                        </ul>
+                        <div class="mt-4">
+                            <span class="badge badge-info">Effort: 2-3 mois</span>
+                        </div>
+                    </div>
+
+                    <!-- Certification -->
+                    <div class="card">
+                        <div class="service-icon" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); margin-bottom: 1rem;">🎓</div>
+                        <h3>Certifications</h3>
+                        <p class="text-sm text-gray mb-4">Système de certification vérifiable.</p>
+                        <ul class="text-sm" style="padding-left: 1.5rem;">
+                            <li>Certificats PDF générés</li>
+                            <li>QR code de vérification</li>
+                            <li>Blockchain optionnel</li>
+                            <li>Partage LinkedIn</li>
+                        </ul>
+                        <div class="mt-4">
+                            <span class="badge badge-success">Effort: 1 mois</span>
+                        </div>
+                    </div>
+
+                    <!-- Analytics -->
+                    <div class="card">
+                        <div class="service-icon" style="background: linear-gradient(135deg, #06b6d4, #3b82f6); margin-bottom: 1rem;">📈</div>
+                        <h3>Analytics Dashboard</h3>
+                        <p class="text-sm text-gray mb-4">Tableau de bord analytique pour les instructeurs.</p>
+                        <ul class="text-sm" style="padding-left: 1.5rem;">
+                            <li>Taux de complétion</li>
+                            <li>Engagement par chapitre</li>
+                            <li>Revenus détaillés</li>
+                            <li>Feedback étudiants</li>
+                        </ul>
+                        <div class="mt-4">
+                            <span class="badge badge-warning">Effort: 2 mois</span>
+                        </div>
+                    </div>
+
+                    <!-- Forum -->
+                    <div class="card">
+                        <div class="service-icon" style="background: linear-gradient(135deg, #14b8a6, #22c55e); margin-bottom: 1rem;">💬</div>
+                        <h3>Forum & Communauté</h3>
+                        <p class="text-sm text-gray mb-4">Espace d'échange entre étudiants et instructeurs.</p>
+                        <ul class="text-sm" style="padding-left: 1.5rem;">
+                            <li>Forums par cours</li>
+                            <li>Questions/Réponses</li>
+                            <li>Upvotes/Downvotes</li>
+                            <li>Notifications mention</li>
+                        </ul>
+                        <div class="mt-4">
+                            <span class="badge badge-warning">Effort: 2 mois</span>
+                        </div>
+                    </div>
+
+                    <!-- Parrainage -->
+                    <div class="card">
+                        <div class="service-icon" style="background: linear-gradient(135deg, #ec4899, #f43f5e); margin-bottom: 1rem;">🤝</div>
+                        <h3>Système de Parrainage</h3>
+                        <p class="text-sm text-gray mb-4">Programme d'affiliation pour la croissance organique.</p>
+                        <ul class="text-sm" style="padding-left: 1.5rem;">
+                            <li>Liens de parrainage uniques</li>
+                            <li>Bonus parrain/filleul</li>
+                            <li>Dashboard affiliés</li>
+                            <li>Retraits automatiques</li>
+                        </ul>
+                        <div class="mt-4">
+                            <span class="badge badge-success">Effort: 1 mois</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Stack Summary -->
+        <section id="tech-stack" class="section-dark">
+            <div class="container">
+                <div class="text-center mb-8">
+                    <h2>Stack <span class="gradient-text">Technologique</span></h2>
+                    <p>Technologies actuelles et recommandées</p>
+                </div>
+
+                <div class="grid grid-3">
+                    <div class="card">
+                        <h3 class="mb-4">🎨 Frontend</h3>
+                        <table>
+                            <tr><td>Framework</td><td><span class="badge badge-success">React 18</span></td></tr>
+                            <tr><td>Build Tool</td><td><span class="badge badge-success">Vite 5</span></td></tr>
+                            <tr><td>Language</td><td><span class="badge badge-success">TypeScript</span></td></tr>
+                            <tr><td>State</td><td><span class="badge badge-success">Redux + Persist</span></td></tr>
+                            <tr><td>Styling</td><td><span class="badge badge-success">Tailwind CSS</span></td></tr>
+                            <tr><td>UI Library</td><td><span class="badge badge-info">MUI + Ant Design</span></td></tr>
+                            <tr><td>Real-time</td><td><span class="badge badge-success">Socket.io Client</span></td></tr>
+                            <tr><td>i18n</td><td><span class="badge badge-success">react-i18next</span></td></tr>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="mb-4">⚡ Backend Node.js</h3>
+                        <table>
+                            <tr><td>Runtime</td><td><span class="badge badge-success">Node.js 20</span></td></tr>
+                            <tr><td>Framework</td><td><span class="badge badge-success">Express 4</span></td></tr>
+                            <tr><td>Language</td><td><span class="badge badge-success">TypeScript</span></td></tr>
+                            <tr><td>ORM</td><td><span class="badge badge-success">Mongoose</span></td></tr>
+                            <tr><td>Auth</td><td><span class="badge badge-success">JWT + bcrypt</span></td></tr>
+                            <tr><td>Validation</td><td><span class="badge badge-success">express-validator</span></td></tr>
+                            <tr><td>Process Manager</td><td><span class="badge badge-success">PM2</span></td></tr>
+                            <tr><td>File Upload</td><td><span class="badge badge-success">Multer</span></td></tr>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="mb-4">☕ Backend Java</h3>
+                        <table>
+                            <tr><td>Framework</td><td><span class="badge badge-warning">Spring Boot 3</span></td></tr>
+                            <tr><td>Language</td><td><span class="badge badge-warning">Java 17</span></td></tr>
+                            <tr><td>ORM</td><td><span class="badge badge-warning">Hibernate/JPA</span></td></tr>
+                            <tr><td>Database</td><td><span class="badge badge-warning">MySQL 8</span></td></tr>
+                            <tr><td>Build</td><td><span class="badge badge-warning">Maven</span></td></tr>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="mb-4">🗄️ Infrastructure</h3>
+                        <table>
+                            <tr><td>Database</td><td><span class="badge badge-success">MongoDB Atlas</span></td></tr>
+                            <tr><td>Cache</td><td><span class="badge badge-success">Redis</span></td></tr>
+                            <tr><td>Message Queue</td><td><span class="badge badge-success">RabbitMQ</span></td></tr>
+                            <tr><td>CDN</td><td><span class="badge badge-success">BunnyCDN</span></td></tr>
+                            <tr><td>Containers</td><td><span class="badge badge-success">Docker</span></td></tr>
+                            <tr><td>Orchestration</td><td><span class="badge badge-warning">Docker Compose</span></td></tr>
+                            <tr><td>Hosting</td><td><span class="badge badge-info">EasyPanel</span></td></tr>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="mb-4">🔒 Sécurité</h3>
+                        <table>
+                            <tr><td>Auth</td><td><span class="badge badge-success">JWT + Refresh</span></td></tr>
+                            <tr><td>Password</td><td><span class="badge badge-success">bcryptjs</span></td></tr>
+                            <tr><td>Headers</td><td><span class="badge badge-success">Helmet</span></td></tr>
+                            <tr><td>CORS</td><td><span class="badge badge-success">cors middleware</span></td></tr>
+                            <tr><td>Rate Limit</td><td><span class="badge badge-success">express-rate-limit</span></td></tr>
+                            <tr><td>Captcha</td><td><span class="badge badge-success">reCAPTCHA</span></td></tr>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="mb-4">🔧 Dev Tools</h3>
+                        <table>
+                            <tr><td>Package Manager</td><td><span class="badge badge-success">npm/yarn</span></td></tr>
+                            <tr><td>Linting</td><td><span class="badge badge-success">ESLint</span></td></tr>
+                            <tr><td>Formatting</td><td><span class="badge badge-info">Prettier</span></td></tr>
+                            <tr><td>Git</td><td><span class="badge badge-success">Git + Branches</span></td></tr>
+                            <tr><td>API Docs</td><td><span class="badge badge-warning">OpenAPI (partial)</span></td></tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer style="padding: 3rem 0; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div class="container text-center">
+                <div class="flex items-center justify-center gap-4 mb-4">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, var(--rivezli), var(--rivezli1)); display: flex; align-items: center; justify-content: center;">
+                        <span style="font-size: 1.5rem;">🎓</span>
+                    </div>
+                    <span style="font-size: 1.25rem; font-weight: 700;" class="gradient-text">Rivezli Platform</span>
+                </div>
+                <p class="text-sm text-gray mb-2">Documentation Architecturale SOA Améliorée</p>
+                <p class="text-xs" style="color: #475569;">Dernière mise à jour • Version 3.0.0 - Documentation Technique Complète</p>
+                <p class="text-xs mt-4" style="color: #475569;">
+                    Cette documentation utilise du CSS pur compilé sans dépendance CDN pour un usage en production.<br>
+                    Inclut: Architecture détaillée, Endpoints API, Modèles de données, Patterns de communication
+                </p>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Scroll to Top -->
+    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" 
+            style="position: fixed; bottom: 2rem; right: 2rem; width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--rivezli), var(--rivezli1)); color: white; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(39, 166, 194, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; z-index: 100;">
+        ↑
+    </button>
+
+    <script>
+        // Active navigation highlighting
+        document.addEventListener('DOMContentLoaded', function() {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (scrollY >= sectionTop - 200) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.style.background = '';
+                    link.style.color = '#94a3b8';
+                    link.style.borderLeftColor = 'transparent';
+                    if (link.getAttribute('href') === '#' + current) {
+                        link.style.background = 'rgba(39, 166, 194, 0.1)';
+                        link.style.color = '#fff';
+                        link.style.borderLeftColor = '#27A6C2';
+                    }
+                });
+            });
+        });
+
+        // Animate on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.card, .service-node').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
